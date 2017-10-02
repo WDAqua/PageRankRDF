@@ -128,6 +128,7 @@ public class SimpleSummarizer implements Summarizer {
 				}
 
 				objects.add(object);
+				System.out.println(object);
 			}
 			r2.close();
 

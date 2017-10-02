@@ -32,25 +32,26 @@ public class SummarizerDBLP implements Summarizer {
 			+ "OPTIONAL {<ENTITY> <http://www.w3.org/2000/01/rdf-schema#label> ?l . }}";
 			//+ "FILTER regex(lang(?l), \"LANG\", \"i\") . }}";
 	
-	private static final String QUERY_1 = "PREFIX vrank:<http://purl.org/voc/vrank#>"
-			+ "SELECT DISTINCT ?o ?l "
+	private static final String QUERY_1 = "PREFIX vrank:<http://purl.org/voc/vrank#> "
+			+ "SELECT DISTINCT ?o (SAMPLE(?label) as ?l) "
 			//+ "FROM <http://people.aifb.kit.edu/ath/#DBpedia_PageRank> "
 			//+ "FROM <http://dbpedia.org> WHERE"
-			+ "FROM "
-                        + "{<ENTITY> ?p ?o . ?o vrank:hasRank/vrank:rankValue ?pageRank."
+			+ "{<ENTITY> ?p ?o . ?o vrank:hasRank/vrank:rankValue ?pageRank. "
 			+ "PREDICATES"
-			+ "OPTIONAL {?o <http://www.w3.org/2000/01/rdf-schema#label> ?l . }}"
+			+ "OPTIONAL {?o <http://www.w3.org/2000/01/rdf-schema#label> ?label . } "
+			+ "FILTER (lang(?lable)=\"en\" || lang(?label)=\"\"). "
+			+ "}"
 			//+ "FILTER regex(lang(?l), \"LANG\", \"i\") .}}"
-			+ "ORDER BY DESC (?pageRank) LIMIT TOPK";
+			+ "GROUP BY ?o ORDER BY DESC (?pageRank) LIMIT TOPK";
 	
 	private static final String QUERY_2 = "PREFIX vrank:<http://purl.org/voc/vrank#>"
 			+ "SELECT ?p ?l ?rank "
+			+ "WHERE { "
 			//+ "FROM <http://people.aifb.kit.edu/ath/#DBpedia_PageRank> "
 			//+ "FROM <http://dbpedia.org> WHERE {"
-			+ "FROM "
-                        + "<ENTITY> ?p <OBJECT> ."
-			+ "<OBJECT> vrank:hasRank/vrank:rankValue ?rank ."
-			+ "OPTIONAL {?p <http://www.w3.org/2000/01/rdf-schema#label> ?l. }"
+			+ "<ENTITY> ?p <OBJECT> . "
+			+ "<OBJECT> vrank:hasRank/vrank:rankValue ?rank . "
+			+ "OPTIONAL {?p <http://www.w3.org/2000/01/rdf-schema#label> ?l. } "
 			+ "} ORDER BY asc(?p)";
                         //+ "FILTER regex(lang(?l), \"LANG\", \"i\")} } ORDER BY asc(?p)";
 	
@@ -59,8 +60,14 @@ public class SummarizerDBLP implements Summarizer {
 	 * main method to test the summarizer
 	 */
 	public static void main(String[] args) throws URISyntaxException {
-		Summarizer summ = new SimpleSummarizer();
+		Summarizer summ = new SummarizerDBLP();
+		System.out.println("Start");
+		System.out.println(QUERY_0);
+		System.out.println(QUERY_1);
+		System.out.println(QUERY_2);
+
 		LinkedList<TripleMeta> meta = summ.summarize(new java.net.URI("http://dblp.l3s.de/d2r/resource/authors/Dennis_Diefenbach"), null, 5, 1, null);
+		System.out.println("After");
 		for (TripleMeta tripleMeta : meta) {
 			System.out.println(tripleMeta.toString());
 		}
@@ -68,8 +75,10 @@ public class SummarizerDBLP implements Summarizer {
 	
 	public LinkedList<TripleMeta> summarize(java.net.URI uri, String[] fixedProperties,
 			Integer topK, Integer maxHops, String language) {
+		System.out.println("Eneter");
 		SPARQLRepository rep = new SPARQLRepository(REPOSITORY);
-		
+		System.out.println("Eneter");
+
 		if (language == null) {
 			language = "en";
 		}
@@ -85,14 +94,16 @@ public class SummarizerDBLP implements Summarizer {
 		try {
 			rep.initialize();
 			con = rep.getConnection();
+			System.out.println(QUERY_0.replace("ENTITY", uri.toString()).replace("LANG", language));
 			TupleQuery q1 = con.prepareTupleQuery(QueryLanguage.SPARQL, 
 					QUERY_0.replace("ENTITY", uri.toString()).replace("LANG", language));
 			TupleQueryResult r1 = q1.evaluate();
 			URI subject = null;
+			System.out.println("query 0"+r1.hasNext());
 			if (r1.hasNext()) {
 				BindingSet set = r1.next();
 				Binding l = set.getBinding("l");
-				
+				System.out.println(l.toString());
 				if (l == null) {
 					subject = new URI(uri);
 				} else {
@@ -115,22 +126,24 @@ public class SummarizerDBLP implements Summarizer {
 			} else {
 				query1 = query1.replaceAll("PREDICATES", "");
 			}
+			System.out.println(query1);
 			TupleQuery q2 = con.prepareTupleQuery(QueryLanguage.SPARQL, query1);
 
 			TupleQueryResult r2 = q2.evaluate();
-			ArrayList<URI> objects = new ArrayList<URI>(); 
+			ArrayList<URI> objects = new ArrayList<URI>();
+			System.out.println("quer1 "+r2.hasNext());
 			while (r2.hasNext()) {
 				BindingSet set = r2.next();
 				Binding o = set.getBinding("o");
 				Binding l = set.getBinding("l");
 				URI object = null;
-				if (l == null) {
+				if (o != null && l == null) {
 					object = new URI(new java.net.URI(o.getValue().toString()));
-				} else {
+					objects.add(object);
+				} else  if (o != null && l != null){
 					object = new URI(new java.net.URI(o.getValue().toString()), l.getValue().stringValue(), ((Literal) l.getValue()).getLanguage());
+					objects.add(object);
 				}
-
-				objects.add(object);
 			}
 			r2.close();
 
@@ -140,6 +153,7 @@ public class SummarizerDBLP implements Summarizer {
 						replace("LANG", language).
 						replace("OBJECT", object.getURI().toString()));
 				TupleQueryResult r3 = q3.evaluate();
+				System.out.println(q3);
 				if (r3.hasNext()) {
 					BindingSet set = r3.next();
 					Binding p = set.getBinding("p");

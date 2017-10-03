@@ -6,7 +6,12 @@
     <packaging>war</packaging>
     <version>0.0.1-SNAPSHOT</version>
     <name>summa Jersey Webapp</name>
-    <build>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>1.5.2.RELEASE</version>
+    </parent>
+<build>
         <finalName>summa</finalName>
         <plugins>
             <plugin>
@@ -21,6 +26,15 @@
             <plugin>
                 <groupId>org.glassfish</groupId>
                 <artifactId>maven-glassfish-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.14.1</version>
             </plugin>
         </plugins>
     </build>
@@ -58,6 +72,15 @@
     		<version>2.8.6</version>
     		<type>jar</type>
   		</dependency>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-test</artifactId>
+        <scope>test</scope>
+    </dependency>
     </dependencies>
     <properties>
         <jersey-version>1.17</jersey-version>
@@ -81,6 +104,10 @@
 			<name>OpenRDF Sesame repository</name>
 			<url>http://maven.apache.org/POM/4.0.0</url>
 			</repository>
+        <repository>
+            <id>spring-releases</id>
+            <url>https://repo.spring.io/libs-release</url>
+        </repository>
     </repositories>
     <pluginRepositories>
         <pluginRepository>
@@ -88,6 +115,10 @@
             <name>Java.net Maven 2 Repository</name>
             <url>http://download.java.net/maven/2</url>
             <layout>default</layout>
-        </pluginRepository>  
+        </pluginRepository>
+        <pluginRepository>
+            <id>spring-releases</id>
+            <url>https://repo.spring.io/libs-release</url>
+        </pluginRepository>
     </pluginRepositories>
 </project>

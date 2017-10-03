@@ -12,11 +12,13 @@ import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.sparql.SPARQLRepository;
+import org.openrdf.rio.RDFFormat;
 
 import edu.kit.aifb.summa.model.Property;
 import edu.kit.aifb.summa.model.TripleMeta;
 import edu.kit.aifb.summa.model.URI;
 import edu.kit.aifb.summa.model.TripleMeta.TripleFocus;
+import edu.kit.aifb.summa.servlet.JerseyService;
 
 
 /**
@@ -60,17 +62,22 @@ public class SummarizerDBLP implements Summarizer {
 	 * main method to test the summarizer
 	 */
 	public static void main(String[] args) throws URISyntaxException {
+		String uri = "http://dblp.l3s.de/d2r/resource/publications/conf/esws/BothDSSC016";
+
 		Summarizer summ = new SummarizerDBLP();
 		System.out.println("Start");
 		System.out.println(QUERY_0);
 		System.out.println(QUERY_1);
 		System.out.println(QUERY_2);
 
-		LinkedList<TripleMeta> meta = summ.summarize(new java.net.URI("http://dblp.l3s.de/d2r/resource/authors/Dennis_Diefenbach"), null, 5, 1, null);
+		LinkedList<TripleMeta> meta = summ.summarize(new java.net.URI(uri), null, 5, 1, null);
 		System.out.println("After");
 		for (TripleMeta tripleMeta : meta) {
 			System.out.println(tripleMeta.toString());
 		}
+
+		//JerseyService service = new JerseyService();
+		//service.executeQuery(uri, 5,1,new String[0], "en", RDFFormat.TURTLE);
 	}
 	
 	public LinkedList<TripleMeta> summarize(java.net.URI uri, String[] fixedProperties,
@@ -107,7 +114,11 @@ public class SummarizerDBLP implements Summarizer {
 				if (l == null) {
 					subject = new URI(uri);
 				} else {
-					subject = new URI(uri, l.getValue().stringValue(), ((Literal) l.getValue()).getLanguage());
+					String langTag = "en";
+					if (((Literal) l.getValue()).getLanguage()!=null){
+						langTag = ((Literal) l.getValue()).getLanguage();
+					}
+					subject = new URI(uri, l.getValue().stringValue(), langTag);
 				}
 				
 			}

@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -56,13 +57,19 @@ public class WebController {
         response.setHeader("Access-Control-Allow-Origin", "*");
     }
 
-    @RequestMapping("/")
+    @RequestMapping("/sum")
     public String summa(@RequestParam(value="entity") String entity,
-                        @RequestParam(value="kb") String kb,
+                        @RequestParam(value="kb", defaultValue = "dblp") String kb,
                         @RequestParam(value="topK", defaultValue = "5") Integer topK,
                         @RequestParam(value="fixedProperty", defaultValue ="") String[] fixedProperties,
                         @RequestParam(value="language", defaultValue = "en") String language,
-                        @RequestParam(value="maxHops", defaultValue = "1") Integer maxHops) {
+                        @RequestParam(value="maxHops", defaultValue = "1") Integer maxHops,
+                        @RequestHeader(value="Accept") String header) {
+        RDFFormat outputFormat = Rio.getParserFormatForMIMEType(header.split(",")[0]);
+        System.out.println("outputFormat"+outputFormat);
+        if (outputFormat == null) {
+            outputFormat = RDFFormat.TURTLE;
+        }
         Summarizer summarizer = null;
         if (kb.equals("dblp")){
             summarizer = new SummarizerDBLP();
@@ -71,8 +78,8 @@ public class WebController {
         } else {
             logger.info("The endpoint is not dblp nor musicbrainz");
         }
-
-        //logger.info("Request sparql: {}, lang: {}, kb: {}",sparql,lang,kb,endpoint);
+        System.out.println(entity);
+        logger.info("Request kb: {}, entity: {}, topk: {}",kb,entity,topK);
 
 
         entity = filter(entity);
@@ -105,7 +112,7 @@ public class WebController {
 
         StringWriter writer = new StringWriter();
         try {
-            Rio.write(result, writer, RDFFormat.TURTLE);
+            Rio.write(result, writer, outputFormat);
         } catch (RDFHandlerException e) {
             e.printStackTrace();
         }

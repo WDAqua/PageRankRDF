@@ -60,9 +60,9 @@ public class WebController {
         response.setHeader("Access-Control-Allow-Origin", "*");
     }
 
-    @RequestMapping("/")
+    @RequestMapping("/sum")
     public String summa(@RequestParam(value="entity") String entity,
-                        @RequestParam(value="kb") String kb,
+                        @RequestParam(value="kb", defaultValue = "dblp") String kb,
                         @RequestParam(value="topK", defaultValue = "5") Integer topK,
                         @RequestParam(value="fixedProperty", defaultValue ="") String[] fixedProperties,
                         @RequestParam(value="language", defaultValue = "en") String language,
@@ -80,8 +80,8 @@ public class WebController {
         } else {
             logger.info("The endpoint is not dblp nor musicbrainz");
         }
-
-        //logger.info("Request sparql: {}, lang: {}, kb: {}",sparql,lang,kb,endpoint);
+        System.out.println(entity);
+        logger.info("Request kb: {}, entity: {}, topk: {}",kb,entity,topK);
 
 
         entity = filter(entity);

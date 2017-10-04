@@ -36,19 +36,17 @@ public class SummarizerMusicBrainz implements Summarizer {
 			+ "OPTIONAL {<ENTITY> <http://purl.org/dc/elements/1.1/title> ?l }}";
 			//+ "FILTER regex(lang(?l), \"LANG\", \"i\") . }}";
 	
-	private static final String QUERY_1 = "PREFIX vrank:<http://purl.org/voc/vrank#> "
-			+ "SELECT DISTINCT ?o (SAMPLE(?label) as ?l) "
-			//+ "FROM <http://people.aifb.kit.edu/ath/#DBpedia_PageRank> "
-			//+ "FROM <http://dbpedia.org> WHERE"
+	private static final String QUERY_1 ="PREFIX vrank:<http://purl.org/voc/vrank#> "
+			+ "SELECT ?o ?label WHERE { "
+                        + "SELECT DISTINCT ?o WHERE "
 			+ "{<ENTITY> ?p ?o . ?o vrank:hasRank/vrank:rankValue ?pageRank. "
-			+ "PREDICATES"
+			+ "PREDICATES } "
+                        + "ORDER BY DESC (?pageRank) LIMIT TOPK } "
 			+ "OPTIONAL {?o <http://www.w3.org/2000/01/rdf-schema#label> ?label . } "
 			+ "OPTIONAL {?o <http://xmlns.com/foaf/0.1/name> ?label } "
 			+ "OPTIONAL {?o <http://purl.org/dc/elements/1.1/title> ?label } "
-			+ "FILTER (lang(?lable)=\"en\" || lang(?label)=\"\"). "
-			+ "}"
-			//+ "FILTER regex(lang(?l), \"LANG\", \"i\") .}}"
-			+ "GROUP BY ?o ORDER BY DESC (?pageRank) LIMIT TOPK";
+			+ "FILTER (lang(?label)=\"en\" || lang(?label)=\"\"). "
+			+ "}";
 	
 	private static final String QUERY_2 = "PREFIX vrank:<http://purl.org/voc/vrank#>"
 			+ "SELECT ?p ?l ?rank "

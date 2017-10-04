@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,6 +30,9 @@ import java.util.List;
 
 import edu.kit.aifb.summa.model.TripleMeta;
 import edu.kit.aifb.summa.model.URI;
+import edu.kit.aifb.summa.summarizer.Summarizer;
+import edu.kit.aifb.summa.summarizer.SummarizerDBLP;
+import edu.kit.aifb.summa.summarizer.SummarizerMusicBrainz;
 
 @RestController
 public class WebController {
@@ -62,7 +66,12 @@ public class WebController {
                         @RequestParam(value="topK", defaultValue = "5") Integer topK,
                         @RequestParam(value="fixedProperty", defaultValue ="") String[] fixedProperties,
                         @RequestParam(value="language", defaultValue = "en") String language,
-                        @RequestParam(value="maxHops", defaultValue = "1") Integer maxHops) {
+                        @RequestParam(value="maxHops", defaultValue = "1") Integer maxHops,
+                        @RequestHeader(value="Accept") String header) {
+        RDFFormat outputFormat = Rio.getParserFormatForMIMEType(header.split(",")[0]);
+        if (outputFormat == null) {
+            outputFormat = RDFFormat.TURTLE;
+        }
         Summarizer summarizer = null;
         if (kb.equals("dblp")){
             summarizer = new SummarizerDBLP();
@@ -105,7 +114,7 @@ public class WebController {
 
         StringWriter writer = new StringWriter();
         try {
-            Rio.write(result, writer, RDFFormat.TURTLE);
+            Rio.write(result, writer, outputFormat);
         } catch (RDFHandlerException e) {
             e.printStackTrace();
         }

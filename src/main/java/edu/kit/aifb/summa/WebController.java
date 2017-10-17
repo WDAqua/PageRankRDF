@@ -30,6 +30,9 @@ import java.util.List;
 
 import edu.kit.aifb.summa.model.TripleMeta;
 import edu.kit.aifb.summa.model.URI;
+import edu.kit.aifb.summa.summarizer.Summarizer;
+import edu.kit.aifb.summa.summarizer.SummarizerDBLP;
+import edu.kit.aifb.summa.summarizer.SummarizerMusicBrainz;
 
 @RestController
 public class WebController {
@@ -66,7 +69,6 @@ public class WebController {
                         @RequestParam(value="maxHops", defaultValue = "1") Integer maxHops,
                         @RequestHeader(value="Accept") String header) {
         RDFFormat outputFormat = Rio.getParserFormatForMIMEType(header.split(",")[0]);
-        System.out.println("outputFormat"+outputFormat);
         if (outputFormat == null) {
             outputFormat = RDFFormat.TURTLE;
         }

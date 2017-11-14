@@ -86,7 +86,6 @@ public class PageRankHDT {
                 }
             }
         }
-        System.out.println("NUMBER "+numberNonLiterals);
 
         pageRankScoresShared = new double[(int)hdt.getDictionary().getNshared()+1];
         pageRankScoresObjects = new double[numberNonLiterals];
@@ -119,7 +118,6 @@ public class PageRankHDT {
             for (int k=1; k<=nShared+numberNonLiterals; k++){
                 int id = k;
                 if (k>nShared){
-                    System.out.println("ID "+k);
                     id = indexesNonLiterals.get(k-nShared-1);
                 }
                 TripleID root = new TripleID(0, 0,id);
@@ -141,10 +139,8 @@ public class PageRankHDT {
                 }
                 if (id<=nShared){
                     pageRankScoresShared[id]=pageRank;
-                    System.out.println(hdt.getDictionary().idToString(id,TripleComponentRole.SUBJECT) + " " +pageRank);
                 } else {
                     pageRankScoresObjects[k-nShared-1]=pageRank;
-                    System.out.println(hdt.getDictionary().idToString(id,TripleComponentRole.SUBJECT) + " " +pageRank);
                 }
             }
 
@@ -161,7 +157,6 @@ public class PageRankHDT {
         }
         for (int k=0; k<numberNonLiterals; k++){
             int id = indexesNonLiterals.get(k);
-            System.out.println(id);
             Score s = new Score();
             s.node = hdt.getDictionary().idToString(id,TripleComponentRole.OBJECT).toString();
             s.pageRank =  pageRankScoresObjects[k];

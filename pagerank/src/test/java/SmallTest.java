@@ -72,6 +72,101 @@ public class SmallTest implements ProgressListener{
         }
     }
 
+    @Test
+    public void go3(){
+        System.out.println("Checking third example");
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(classLoader.getResource("example3.n3").getFile());
+        HDT hdt = null;
+        try {
+            hdt = HDTManager.generateHDT(file.getAbsolutePath(), "", RDFNotation.NTRIPLES, new HDTSpecification(), this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParserException e) {
+            e.printStackTrace();
+        }
+
+        PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.85, 0.15 , 20);
+        pageRankHDT.compute();
+
+        List<PageRankHDT.Score> scores= pageRankHDT.getPageRankScores();
+        HashMap<String,Double> result = new HashMap<String, Double>();
+        result.put("PageA", 1.49);
+        result.put("PageB", 0.78);
+        result.put("PageC", 1.58);
+        result.put("PageD", 0.15);
+        for (PageRankHDT.Score score : scores){
+            assertEquals(result.get(score.node), score.pageRank, 0.01);
+        }
+    }
+
+    @Test
+    public void go4(){
+        System.out.println("Checking fourth example");
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(classLoader.getResource("example4.n3").getFile());
+        HDT hdt = null;
+        try {
+            hdt = HDTManager.generateHDT(file.getAbsolutePath(), "", RDFNotation.NTRIPLES, new HDTSpecification(), this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParserException e) {
+            e.printStackTrace();
+        }
+
+        PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.85, 0.15 , 20);
+        pageRankHDT.compute();
+
+        List<PageRankHDT.Score> scores= pageRankHDT.getPageRankScores();
+        HashMap<String,Double> result = new HashMap<String, Double>();
+        result.put("PageA", 0.92);
+        result.put("PageB", 0.41);
+        result.put("PageC", 0.41);
+        result.put("PageD", 0.41);
+        result.put("PageE", 0.22);
+        result.put("PageF", 0.22);
+        result.put("PageG", 0.22);
+        result.put("PageH", 0.22);
+
+        for (PageRankHDT.Score score : scores){
+            assertEquals(result.get(score.node), score.pageRank, 0.01);
+        }
+    }
+
+    @Test
+    public void go5(){
+        System.out.println("Checking fifth example");
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(classLoader.getResource("example5.n3").getFile());
+        HDT hdt = null;
+        try {
+            hdt = HDTManager.generateHDT(file.getAbsolutePath(), "", RDFNotation.NTRIPLES, new HDTSpecification(), this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParserException e) {
+            e.printStackTrace();
+        }
+
+        PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.85, 0.15 , 20);
+        pageRankHDT.compute();
+
+        List<PageRankHDT.Score> scores= pageRankHDT.getPageRankScores();
+        pageRankHDT.printPageRankScores();
+        HashMap<String,Double> result = new HashMap<String, Double>();
+        result.put("PageA", 0.92);
+        result.put("PageB", 0.41);
+        result.put("PageC", 0.41);
+        result.put("PageD", 0.41);
+        result.put("PageE", 0.22);
+        result.put("PageF", 0.22);
+        result.put("PageG", 0.22);
+        result.put("PageH", 0.22);
+
+        for (PageRankHDT.Score score : scores){
+            assertEquals(result.get(score.node), score.pageRank, 0.01);
+        }
+    }
+
     @Override
     public void notifyProgress(float level, String message) {
         if(false) {

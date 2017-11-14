@@ -1,0 +1,7 @@
+<PageA> <link> <PageB> .
+<PageA> <link> "literal1" .
+<PageA> <link> <PageC> .
+<PageB> <link> <PageC> .
+<PageC> <link> <PageA> .
+<PageC> <link> "literal2" .
+<PageD> <link> <PageC> .

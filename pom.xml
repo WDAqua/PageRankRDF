@@ -3,7 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.kit.aifb.summa</groupId>
     <artifactId>summa</artifactId>
+    <packaging>pom</packaging>
     <version>0.0.1-SNAPSHOT</version>
+    <modules>
+        <module>pagerank</module>
+    </modules>
     <name>summa web app</name>
     <parent>
         <groupId>org.springframework.boot</groupId>

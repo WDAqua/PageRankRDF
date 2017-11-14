@@ -24,7 +24,7 @@ public class PageRankHDT {
     private static double dampingFactor = 0.85D;
     private static double startValue = 0.1D;
     private static int numberOfIterations = 40;
-    private List<Integer> numberOutgoing;
+    private int[] numberOutgoing;
     private double[] pageRankScoresShared;
     private double[] pageRankScoresObjects;
 
@@ -74,8 +74,8 @@ public class PageRankHDT {
         System.out.println("nShared "+nShared);
 
         //Compute the number of outgoing links
-        numberOutgoing = new ArrayList<Integer>();
-        numberOutgoing.add(0);
+        numberOutgoing = new int[(int)hdt.getDictionary().getNsubjects()+1];
+        numberOutgoing[0]=0;
         for (int id=1; id<=nSubjects; id++) {
             IteratorTripleID iteratorTripleID = hdt.getTriples().search(new TripleID(id, 0, 0));
             int count = 0;
@@ -83,7 +83,7 @@ public class PageRankHDT {
                 iteratorTripleID.next();
                 count++;
             }
-            numberOutgoing.add(count);
+            numberOutgoing[id]=count;
         }
 
         //Initialize the start page rank scores
@@ -116,7 +116,7 @@ public class PageRankHDT {
                         } else {
                             pageRankIn = startValue;
                         }
-                        long numberOut = numberOutgoing.get(inLink.getSubject());
+                        long numberOut = numberOutgoing[inLink.getSubject()];
                         System.out.println("dampingFactor "+dampingFactor);
                         System.out.println("pageRankIn "+pageRankIn);
                         System.out.println("numberOut "+numberOut);

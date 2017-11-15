@@ -1,4 +1,4 @@
-package edu.kit.aifb.summa;
+package edu.kit.aifb;
 
 import javax.security.auth.message.config.AuthConfigFactory;
 import org.apache.catalina.authenticator.jaspic.AuthConfigFactoryImpl;

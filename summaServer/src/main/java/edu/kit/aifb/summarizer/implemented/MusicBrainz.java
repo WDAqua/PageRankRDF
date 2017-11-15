@@ -1,6 +1,8 @@
-package edu.kit.aifb.summa.summarizer;
+package edu.kit.aifb.summarizer.implemented;
 
-public class SummarizerMusicBrainz extends Summarizer {
+import edu.kit.aifb.summarizer.Summarizer;
+
+public class MusicBrainz extends Summarizer {
 
 	public String getRepository(){
 		return "https://wdaqua.univ-st-etienne.fr/hdt-endpoint/musicbrainz/sparql";

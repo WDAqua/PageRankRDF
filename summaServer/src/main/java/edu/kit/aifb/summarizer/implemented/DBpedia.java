@@ -1,11 +1,13 @@
-package edu.kit.aifb.summa.summarizer;
+package edu.kit.aifb.summarizer.implemented;
+
+import edu.kit.aifb.summarizer.Summarizer;
 
 /**
  * This is an example summarization approach that generates summaries with
  * the public DBpedia SPARQL endpoint.
  *
  */
-public class SimpleSummarizer extends Summarizer {
+public class DBpedia extends Summarizer {
 
 	public String getRepository(){
 		return "http://dbpedia.org/sparql";

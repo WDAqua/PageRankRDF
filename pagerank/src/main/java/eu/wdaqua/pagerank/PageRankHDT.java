@@ -10,10 +10,11 @@ import org.rdfhdt.hdt.triples.TripleID;
 import org.rdfhdt.hdtjena.NodeDictionary;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PageRankHDT {
+public class PageRankHDT implements PageRank{
 
     private static double dampingFactor = 0.85D;
     private static double startValue = 0.1D;
@@ -24,11 +25,11 @@ public class PageRankHDT {
     private double[] pageRankScoresObjects;
     List<Integer> indexesNonLiterals = new ArrayList<>();
 
-    PageRankHDT(String hdtDump){
+    public PageRankHDT(String hdtDump){
         this.load(hdtDump);
     }
 
-    PageRankHDT(String hdtDump, double dampingFactor, double startValue,  int numberOfIterations){
+    public PageRankHDT(String hdtDump, double dampingFactor, double startValue,  int numberOfIterations){
         this.load(hdtDump);
         this.dampingFactor = dampingFactor;
         this.startValue = startValue;
@@ -51,7 +52,7 @@ public class PageRankHDT {
     }
 
     public void compute() {
-        System.out.println("Computing eu.wdaqua.pagerank.PageRank: " + numberOfIterations +
+        System.out.println("Computing PageRank: " + numberOfIterations +
                 " iterations, damping factor " + dampingFactor +
                 ", start value " + startValue);
 
@@ -138,26 +139,26 @@ public class PageRankHDT {
         System.out.println("\n");
     }
 
-    public List<Score> getPageRankScores() {
+    public List<PageRankScore> getPageRankScores() {
         int nShared = (int) hdt.getDictionary().getNshared();
         int nSubjects = (int) hdt.getDictionary().getNsubjects();
         int nObjects= (int) hdt.getDictionary().getNobjects();
-        List<Score> scores = new ArrayList<Score>();
+        List<PageRankScore> scores = new ArrayList<PageRankScore>();
         for (int id=1; id<=nShared; id++){
-            Score s = new Score();
+            PageRankScore s = new PageRankScore();
             s.node = hdt.getDictionary().idToString(id,TripleComponentRole.SUBJECT).toString();
             s.pageRank =  pageRankScoresShared[id];
             scores.add(s);
         }
         for (int k=0; k<indexesNonLiterals.size(); k++){
             int id = indexesNonLiterals.get(k);
-            Score s = new Score();
+            PageRankScore s = new PageRankScore();
             s.node = hdt.getDictionary().idToString(id,TripleComponentRole.OBJECT).toString();
             s.pageRank =  pageRankScoresObjects[k];
             scores.add(s);
         }
         for (int id=1; id<=(nSubjects-nShared); id++){
-            Score s = new Score();
+            PageRankScore s = new PageRankScore();
             s.node = hdt.getDictionary().idToString(id+nShared,TripleComponentRole.SUBJECT).toString();
             s.pageRank =  startValue;
             scores.add(s);
@@ -166,20 +167,35 @@ public class PageRankHDT {
 
     }
 
-    public void printPageRankScores(){
+    public void printPageRankScoresTSV(PrintWriter writer){
         int nShared = (int) hdt.getDictionary().getNshared();
         int nSubjects = (int) hdt.getDictionary().getNsubjects();
         int nObjects= (int) hdt.getDictionary().getNobjects();
         for (int id=1; id<=nShared; id++){
-            System.out.println(hdt.getDictionary().idToString(id,TripleComponentRole.SUBJECT) + "\t" + pageRankScoresShared[id]);
+            writer.println(hdt.getDictionary().idToString(id,TripleComponentRole.SUBJECT) + "\t" + pageRankScoresShared[id]);
         }
         for (int k=0; k<indexesNonLiterals.size(); k++){
             int id = indexesNonLiterals.get(k);
-            System.out.println(hdt.getDictionary().idToString(id,TripleComponentRole.OBJECT) + "\t" + pageRankScoresObjects[k]);
+            writer.println(hdt.getDictionary().idToString(id,TripleComponentRole.OBJECT) + "\t" + pageRankScoresObjects[k]);
         }
         for (int id=1; id<=(nSubjects-nShared); id++){
-            System.out.println(hdt.getDictionary().idToString(id+nShared,TripleComponentRole.SUBJECT) + "\t" + startValue);
+            writer.println(hdt.getDictionary().idToString(id+nShared,TripleComponentRole.SUBJECT) + "\t" + startValue);
         }
     }
 
+    public void printPageRankScoresRDF(PrintWriter writer){
+        int nShared = (int) hdt.getDictionary().getNshared();
+        int nSubjects = (int) hdt.getDictionary().getNsubjects();
+        int nObjects= (int) hdt.getDictionary().getNobjects();
+        for (int id=1; id<=nShared; id++){
+            writer.println("<"+hdt.getDictionary().idToString(id,TripleComponentRole.SUBJECT)+"> <http://purl.org/voc/vrank#hasRank>\t [<http://purl.org/voc/vrank#rankValue>\t\""+pageRankScoresShared[id]+"\"^^<http://www.w3.org/2001/XMLSchema#float>] .");
+        }
+        for (int k=0; k<indexesNonLiterals.size(); k++){
+            int id = indexesNonLiterals.get(k);
+            writer.println("<"+hdt.getDictionary().idToString(id,TripleComponentRole.OBJECT)+"> <http://purl.org/voc/vrank#hasRank>\t [<http://purl.org/voc/vrank#rankValue>\t\""+pageRankScoresObjects[k]+"\"^^<http://www.w3.org/2001/XMLSchema#float>] .");
+        }
+        for (int id=1; id<=(nSubjects-nShared); id++){
+            writer.println("<"+hdt.getDictionary().idToString(id+nShared,TripleComponentRole.SUBJECT)+"> <http://purl.org/voc/vrank#hasRank>\t [<http://purl.org/voc/vrank#rankValue>\t\""+startValue+"\"^^<http://www.w3.org/2001/XMLSchema#float>] .");
+        }
+    }
 }

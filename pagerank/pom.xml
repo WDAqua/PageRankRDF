@@ -4,23 +4,18 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>summa</artifactId>
-        <groupId>eu.wdaqua.pagerank</groupId>
-        <version>0.0.1-SNAPSHOT</version>
+        <groupId>eu.wdaqua</groupId>
+        <version>0.1.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
+    <groupId>eu.wdaqua</groupId>
     <artifactId>pagerank</artifactId>
+    <version>0.1.0</version>
     <dependencies>
         <dependency>
             <groupId>org.rdfhdt</groupId>
             <artifactId>hdt-java-core</artifactId>
             <version>2.0-SNAPSHOT</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.rdfhdt</groupId>
@@ -31,6 +26,12 @@
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
             <version>1.69</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.2</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     <build>
@@ -60,14 +61,24 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>eu.wdaqua.core1.tools.Main</mainClass>
+                            <mainClass>eu.wdaqua.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
-
-
-
 </project>

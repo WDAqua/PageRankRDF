@@ -1,4 +1,4 @@
-package edu.kit.aifb.summa.summarizer;
+package edu.kit.aifb.summarizer;
 
 import org.openrdf.model.Literal;
 import org.openrdf.query.Binding;
@@ -12,13 +12,13 @@ import org.openrdf.repository.sparql.SPARQLRepository;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import edu.kit.aifb.summa.model.Property;
-import edu.kit.aifb.summa.model.TripleMeta;
-import edu.kit.aifb.summa.model.URI;
+import edu.kit.aifb.model.Property;
+import edu.kit.aifb.model.TripleMeta;
+import edu.kit.aifb.model.URI;
 
 
 /**
- * This interface needs to be implemented by each entity summarization system.
+ * This abstract class needs to be implemented by each entity summarization system.
  *
  */
 public abstract class Summarizer {
@@ -26,18 +26,22 @@ public abstract class Summarizer {
 	// method that returns the SPARQL endpoint of the corresponding knowledgebase
 	public abstract String getRepository();
 
-	// method that returns the label of an entity. The SPARQL query contains the placeholder <ENTITY>
+	// method that returns SPARQL query for retriving the label of an entity. The SPARQL query
+	// contains the placeholder ENTITY for the uri of the entity and LANG for the language
 	public abstract String getQuery0();
 
+	// method returns a SPARQL query for retriving for an entity the objects with highest page
+	// rank score together with the label. The SPARQL query contains the placeholder ENTITY for
+	// the uri of the entity, LANG for the language of the object labels, TOPK indicating the
+	// number of objects to consider
 	public abstract String getQuery1();
 
+	// method returns a SPARQL query for retriving the label of the predicate
 	public abstract String getQuery2();
 
 	public LinkedList<TripleMeta> summarize(java.net.URI uri, String[] fixedProperties,
-			Integer topK, Integer maxHops, String language){
-		System.out.println("Eneter");
+											Integer topK, Integer maxHops, String language){
 		SPARQLRepository rep = new SPARQLRepository(this.getRepository());
-		System.out.println("Eneter");
 
 		if (language == null) {
 			language = "en";

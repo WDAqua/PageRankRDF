@@ -1,32 +1,15 @@
 package eu.wdaqua.pagerank;
 
-import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
-import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.lang.PipedRDFIterator;
-import org.apache.jena.riot.lang.PipedRDFStream;
-import org.apache.jena.riot.lang.PipedTriplesStream;
-import org.rdfhdt.hdt.enums.TripleComponentRole;
-import org.rdfhdt.hdt.hdt.HDT;
-import org.rdfhdt.hdt.hdt.HDTManager;
-import org.rdfhdt.hdt.triples.IteratorTripleID;
-import org.rdfhdt.hdt.triples.TripleID;
-import org.rdfhdt.hdtjena.NodeDictionary;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.regex.Matcher;
 
-public class PageRankRDF {
+public class PageRankRDF implements PageRank{
 
     private static double dampingFactor = 0.85D;
     private static double startValue = 0.1D;
@@ -108,14 +91,14 @@ public class PageRankRDF {
 
 
         time = System.currentTimeMillis() - time;
-        System.err.println("Computing eu.wdaqua.pagerank.PageRank took " + time / 1000L + "s");
+        System.err.println("Computing PageRank took " + time / 1000L + "s");
     }
 
-    public List<Score> getPageRankScores() {
-        List<Score> scores = new ArrayList<Score>();
+    public List<PageRankScore> getPageRankScores() {
+        List<PageRankScore> scores = new ArrayList<PageRankScore>();
         Set<String> keysetNew = pageRankScores.keySet();
         for (String string : keysetNew) {
-            Score s = new Score();
+            PageRankScore s = new PageRankScore();
             s.node = string;
             s.pageRank = pageRankScores.get(string);
             scores.add(s);
@@ -123,11 +106,19 @@ public class PageRankRDF {
         return scores;
     }
 
-    public void printPageRankScores(){
-        List<Score> scores = new ArrayList<Score>();
+    public void printPageRankScoresTSV(PrintWriter writer){
+        List<PageRankScore> scores = new ArrayList<PageRankScore>();
         Set<String> keysetNew = pageRankScores.keySet();
         for (String string : keysetNew) {
-            System.out.println(string + "\t" + pageRankScores.get(string));
+            writer.println(string + "\t" + pageRankScores.get(string));
+        }
+    }
+
+    public void printPageRankScoresRDF(PrintWriter writer){
+        List<PageRankScore> scores = new ArrayList<PageRankScore>();
+        Set<String> keysetNew = pageRankScores.keySet();
+        for (String string : keysetNew) {
+            writer.println("<"+string+"> <http://purl.org/voc/vrank#hasRank>\t [<http://purl.org/voc/vrank#rankValue>\t\""+pageRankScores.get(string)+"\"^^<http://www.w3.org/2001/XMLSchema#float>] .");
         }
     }
 }

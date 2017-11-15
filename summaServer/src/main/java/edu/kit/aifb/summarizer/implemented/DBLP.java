@@ -1,6 +1,8 @@
-package edu.kit.aifb.summa.summarizer;
+package edu.kit.aifb.summarizer.implemented;
 
-public class SummarizerDBLP extends Summarizer {
+import edu.kit.aifb.summarizer.Summarizer;
+
+public class DBLP extends Summarizer {
 
 	public String getRepository(){
 		return "https://wdaqua.univ-st-etienne.fr/hdt-endpoint/dblp/sparql";
@@ -26,8 +28,6 @@ public class SummarizerDBLP extends Summarizer {
 		return "PREFIX vrank:<http://purl.org/voc/vrank#>"
 				+ "SELECT ?p ?l ?rank "
 				+ "WHERE { "
-				//+ "FROM <http://people.aifb.kit.edu/ath/#DBpedia_PageRank> "
-				//+ "FROM <http://dbpedia.org> WHERE {"
 				+ "<ENTITY> ?p <OBJECT> . "
 				+ "<OBJECT> vrank:hasRank/vrank:rankValue ?rank . "
 				+ "OPTIONAL {?p <http://www.w3.org/2000/01/rdf-schema#label> ?l. } "

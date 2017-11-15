@@ -1,5 +1,5 @@
 import eu.wdaqua.pagerank.PageRankHDT;
-import eu.wdaqua.pagerank.Score;
+import eu.wdaqua.pagerank.PageRankScore;
 
 import org.junit.Test;
 import org.rdfhdt.hdt.enums.RDFNotation;
@@ -35,12 +35,12 @@ public class HDTTest implements ProgressListener{
         PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.50, 1.0 , 20);
         pageRankHDT.compute();
 
-        List<Score> scores= pageRankHDT.getPageRankScores();
+        List<PageRankScore> scores= pageRankHDT.getPageRankScores();
         HashMap<String,Double> result = new HashMap<String, Double>();
         result.put("PageA", 1.07692308);
         result.put("PageB", 0.76923077);
         result.put("PageC", 1.15384615);
-        for (Score score : scores){
+        for (PageRankScore score : scores){
             assertEquals(result.get(score.node), score.pageRank, 0.001);
         }
     }
@@ -62,13 +62,13 @@ public class HDTTest implements ProgressListener{
         PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.85, 0.15 , 20);
         pageRankHDT.compute();
 
-        List<Score> scores= pageRankHDT.getPageRankScores();
+        List<PageRankScore> scores= pageRankHDT.getPageRankScores();
         HashMap<String,Double> result = new HashMap<String, Double>();
         result.put("PageA", 1.49);
         result.put("PageB", 0.78);
         result.put("PageC", 1.58);
         result.put("PageD", 0.15);
-        for (Score score : scores){
+        for (PageRankScore score : scores){
             assertEquals(result.get(score.node), score.pageRank, 0.01);
         }
     }
@@ -90,13 +90,13 @@ public class HDTTest implements ProgressListener{
         PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.85, 0.15 , 20);
         pageRankHDT.compute();
 
-        List<Score> scores= pageRankHDT.getPageRankScores();
+        List<PageRankScore> scores= pageRankHDT.getPageRankScores();
         HashMap<String,Double> result = new HashMap<String, Double>();
         result.put("PageA", 1.49);
         result.put("PageB", 0.78);
         result.put("PageC", 1.58);
         result.put("PageD", 0.15);
-        for (Score score : scores){
+        for (PageRankScore score : scores){
             assertEquals(result.get(score.node), score.pageRank, 0.01);
         }
     }
@@ -118,7 +118,7 @@ public class HDTTest implements ProgressListener{
         PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.85, 0.15 , 20);
         pageRankHDT.compute();
 
-        List<Score> scores= pageRankHDT.getPageRankScores();
+        List<PageRankScore> scores= pageRankHDT.getPageRankScores();
         HashMap<String,Double> result = new HashMap<String, Double>();
         result.put("PageA", 0.92);
         result.put("PageB", 0.41);
@@ -129,7 +129,7 @@ public class HDTTest implements ProgressListener{
         result.put("PageG", 0.22);
         result.put("PageH", 0.22);
 
-        for (Score score : scores){
+        for (PageRankScore score : scores){
             assertEquals(result.get(score.node), score.pageRank, 0.01);
         }
     }
@@ -151,7 +151,7 @@ public class HDTTest implements ProgressListener{
         PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.85, 0.15 , 20);
         pageRankHDT.compute();
 
-        List<Score> scores= pageRankHDT.getPageRankScores();
+        List<PageRankScore> scores= pageRankHDT.getPageRankScores();
         HashMap<String,Double> result = new HashMap<String, Double>();
         result.put("PageA", 0.92);
         result.put("PageB", 0.41);
@@ -162,7 +162,7 @@ public class HDTTest implements ProgressListener{
         result.put("PageG", 0.22);
         result.put("PageH", 0.22);
 
-        for (Score score : scores){
+        for (PageRankScore score : scores){
             assertEquals(result.get(score.node), score.pageRank, 0.01);
         }
     }

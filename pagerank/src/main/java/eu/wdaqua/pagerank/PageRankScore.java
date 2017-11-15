@@ -1,6 +1,6 @@
 package eu.wdaqua.pagerank;
 
-public class Score{
+public class PageRankScore {
     public String node;
     public Double pageRank;
 }

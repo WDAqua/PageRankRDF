@@ -1,4 +1,4 @@
-package edu.kit.aifb.summa.model;
+package edu.kit.aifb.model;
 
 import java.io.Serializable;
 

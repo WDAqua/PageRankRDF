@@ -1,4 +1,4 @@
-package edu.kit.aifb.summa;
+package edu.kit.aifb;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -28,11 +28,11 @@ import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.List;
 
-import edu.kit.aifb.summa.model.TripleMeta;
-import edu.kit.aifb.summa.model.URI;
-import edu.kit.aifb.summa.summarizer.Summarizer;
-import edu.kit.aifb.summa.summarizer.SummarizerDBLP;
-import edu.kit.aifb.summa.summarizer.SummarizerMusicBrainz;
+import edu.kit.aifb.model.TripleMeta;
+import edu.kit.aifb.model.URI;
+import edu.kit.aifb.summarizer.Summarizer;
+import edu.kit.aifb.summarizer.implemented.DBLP;
+import edu.kit.aifb.summarizer.implemented.MusicBrainz;
 
 @RestController
 public class WebController {
@@ -74,9 +74,9 @@ public class WebController {
         }
         Summarizer summarizer = null;
         if (kb.equals("dblp")){
-            summarizer = new SummarizerDBLP();
+            summarizer = new DBLP();
         } else if (kb.equals("musicbrainz")){
-            summarizer = new SummarizerMusicBrainz();
+            summarizer = new MusicBrainz();
         } else {
             logger.info("The endpoint is not dblp nor musicbrainz");
         }

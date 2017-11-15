@@ -1,3 +1,0 @@
-<PageC> <http://purl.org/voc/vrank#hasRank>	 [<http://purl.org/voc/vrank#rankValue>	"1.1921988458661363"^^<http://www.w3.org/2001/XMLSchema#float>] .
-<PageA> <http://purl.org/voc/vrank#hasRank>	 [<http://purl.org/voc/vrank#rankValue>	"1.163369018986216"^^<http://www.w3.org/2001/XMLSchema#float>] .
-<PageB> <http://purl.org/voc/vrank#hasRank>	 [<http://purl.org/voc/vrank#rankValue>	"0.6444318330691419"^^<http://www.w3.org/2001/XMLSchema#float>] .

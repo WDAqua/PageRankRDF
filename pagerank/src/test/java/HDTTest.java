@@ -1,4 +1,5 @@
 import eu.wdaqua.pagerank.PageRankHDT;
+import eu.wdaqua.pagerank.Score;
 
 import org.junit.Test;
 import org.rdfhdt.hdt.enums.RDFNotation;
@@ -16,12 +17,12 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 
-public class SmallTest implements ProgressListener{
+public class HDTTest implements ProgressListener{
     @Test
     public void go1(){
-        System.out.println("Checking first example");
+        System.out.println("Checking example 1 HDT");
         ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource("example1.n3").getFile());
+        File file = new File(classLoader.getResource("example1.nt").getFile());
         HDT hdt = null;
         try {
             hdt = HDTManager.generateHDT(file.getAbsolutePath(), "", RDFNotation.NTRIPLES, new HDTSpecification(), this);
@@ -34,21 +35,21 @@ public class SmallTest implements ProgressListener{
         PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.50, 1.0 , 20);
         pageRankHDT.compute();
 
-        List<PageRankHDT.Score> scores= pageRankHDT.getPageRankScores();
+        List<Score> scores= pageRankHDT.getPageRankScores();
         HashMap<String,Double> result = new HashMap<String, Double>();
         result.put("PageA", 1.07692308);
         result.put("PageB", 0.76923077);
         result.put("PageC", 1.15384615);
-        for (PageRankHDT.Score score : scores){
+        for (Score score : scores){
             assertEquals(result.get(score.node), score.pageRank, 0.001);
         }
     }
 
     @Test
     public void go2(){
-        System.out.println("Checking second example");
+        System.out.println("Checking example 2 HDT");
         ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource("example2.n3").getFile());
+        File file = new File(classLoader.getResource("example2.nt").getFile());
         HDT hdt = null;
         try {
             hdt = HDTManager.generateHDT(file.getAbsolutePath(), "", RDFNotation.NTRIPLES, new HDTSpecification(), this);
@@ -61,22 +62,22 @@ public class SmallTest implements ProgressListener{
         PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.85, 0.15 , 20);
         pageRankHDT.compute();
 
-        List<PageRankHDT.Score> scores= pageRankHDT.getPageRankScores();
+        List<Score> scores= pageRankHDT.getPageRankScores();
         HashMap<String,Double> result = new HashMap<String, Double>();
         result.put("PageA", 1.49);
         result.put("PageB", 0.78);
         result.put("PageC", 1.58);
         result.put("PageD", 0.15);
-        for (PageRankHDT.Score score : scores){
+        for (Score score : scores){
             assertEquals(result.get(score.node), score.pageRank, 0.01);
         }
     }
 
     @Test
     public void go3(){
-        System.out.println("Checking third example");
+        System.out.println("Checking example 3 HDT");
         ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource("example3.n3").getFile());
+        File file = new File(classLoader.getResource("example3.nt").getFile());
         HDT hdt = null;
         try {
             hdt = HDTManager.generateHDT(file.getAbsolutePath(), "", RDFNotation.NTRIPLES, new HDTSpecification(), this);
@@ -89,22 +90,22 @@ public class SmallTest implements ProgressListener{
         PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.85, 0.15 , 20);
         pageRankHDT.compute();
 
-        List<PageRankHDT.Score> scores= pageRankHDT.getPageRankScores();
+        List<Score> scores= pageRankHDT.getPageRankScores();
         HashMap<String,Double> result = new HashMap<String, Double>();
         result.put("PageA", 1.49);
         result.put("PageB", 0.78);
         result.put("PageC", 1.58);
         result.put("PageD", 0.15);
-        for (PageRankHDT.Score score : scores){
+        for (Score score : scores){
             assertEquals(result.get(score.node), score.pageRank, 0.01);
         }
     }
 
     @Test
     public void go4(){
-        System.out.println("Checking fourth example");
+        System.out.println("Checking example 4 HDT");
         ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource("example4.n3").getFile());
+        File file = new File(classLoader.getResource("example4.nt").getFile());
         HDT hdt = null;
         try {
             hdt = HDTManager.generateHDT(file.getAbsolutePath(), "", RDFNotation.NTRIPLES, new HDTSpecification(), this);
@@ -117,7 +118,7 @@ public class SmallTest implements ProgressListener{
         PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.85, 0.15 , 20);
         pageRankHDT.compute();
 
-        List<PageRankHDT.Score> scores= pageRankHDT.getPageRankScores();
+        List<Score> scores= pageRankHDT.getPageRankScores();
         HashMap<String,Double> result = new HashMap<String, Double>();
         result.put("PageA", 0.92);
         result.put("PageB", 0.41);
@@ -128,16 +129,16 @@ public class SmallTest implements ProgressListener{
         result.put("PageG", 0.22);
         result.put("PageH", 0.22);
 
-        for (PageRankHDT.Score score : scores){
+        for (Score score : scores){
             assertEquals(result.get(score.node), score.pageRank, 0.01);
         }
     }
 
     @Test
     public void go5(){
-        System.out.println("Checking fifth example");
+        System.out.println("Checking example 5 HDT");
         ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource("example5.n3").getFile());
+        File file = new File(classLoader.getResource("example5.nt").getFile());
         HDT hdt = null;
         try {
             hdt = HDTManager.generateHDT(file.getAbsolutePath(), "", RDFNotation.NTRIPLES, new HDTSpecification(), this);
@@ -150,8 +151,7 @@ public class SmallTest implements ProgressListener{
         PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.85, 0.15 , 20);
         pageRankHDT.compute();
 
-        List<PageRankHDT.Score> scores= pageRankHDT.getPageRankScores();
-        pageRankHDT.printPageRankScores();
+        List<Score> scores= pageRankHDT.getPageRankScores();
         HashMap<String,Double> result = new HashMap<String, Double>();
         result.put("PageA", 0.92);
         result.put("PageB", 0.41);
@@ -162,7 +162,7 @@ public class SmallTest implements ProgressListener{
         result.put("PageG", 0.22);
         result.put("PageH", 0.22);
 
-        for (PageRankHDT.Score score : scores){
+        for (Score score : scores){
             assertEquals(result.get(score.node), score.pageRank, 0.01);
         }
     }

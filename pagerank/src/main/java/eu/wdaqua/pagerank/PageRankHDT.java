@@ -11,20 +11,14 @@ import org.rdfhdt.hdtjena.NodeDictionary;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class PageRankHDT {
 
-    private HDT hdt;
-    int nShared;
-    int nSubjects;
-    int nObjects;
-    int numberNonLiterals;
     private static double dampingFactor = 0.85D;
     private static double startValue = 0.1D;
     private static int numberOfIterations = 40;
+    private HDT hdt;
     private int[] numberOutgoing;
     private double[] pageRankScoresShared;
     private double[] pageRankScoresObjects;
@@ -43,9 +37,6 @@ public class PageRankHDT {
 
     public PageRankHDT(HDT hdt, double dampingFactor, double startValue, int numberOfIterations){
         this.hdt = hdt;
-        nShared = (int) hdt.getDictionary().getNshared();
-        nSubjects = (int) hdt.getDictionary().getNsubjects();
-        nObjects= (int) hdt.getDictionary().getNobjects();
         this.dampingFactor = dampingFactor;
         this.startValue = startValue;
         this.numberOfIterations = numberOfIterations;
@@ -54,9 +45,6 @@ public class PageRankHDT {
     void load(String hdtDump){
         try {
             hdt = HDTManager.mapIndexedHDT(hdtDump, null);
-            nShared = (int) hdt.getDictionary().getNshared();
-            nSubjects = (int) hdt.getDictionary().getNsubjects();
-            nObjects= (int) hdt.getDictionary().getNobjects();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -67,14 +55,15 @@ public class PageRankHDT {
                 " iterations, damping factor " + dampingFactor +
                 ", start value " + startValue);
 
+        int nShared = (int) hdt.getDictionary().getNshared();
+        int nSubjects = (int) hdt.getDictionary().getNsubjects();
+        int nObjects= (int) hdt.getDictionary().getNobjects();
 
-        System.out.println("nSubjects "+nSubjects);
-        System.out.println("nObjects "+nObjects);
-        System.out.println("nShared "+nShared);
+        System.out.println("Initialize the page rank scores");
 
         //Save indeces which are not literals, don't do pagerank for literal only for not uris
         NodeDictionary nodeDictionary = new NodeDictionary(hdt.getDictionary());
-        numberNonLiterals = 0;
+        int numberNonLiterals = 0;
         for (int id=1; id<=nObjects; id++){
             boolean isLiteral = false;
             if (id>nShared){
@@ -98,7 +87,9 @@ public class PageRankHDT {
             pageRankScoresObjects[k]=startValue;
         }
 
+
         //Compute the number of outgoing links
+        System.out.println("Compute number of outgoing edges");
         numberOutgoing = new int[(int)hdt.getDictionary().getNsubjects()+1];
         numberOutgoing[0]=0;
         for (int id=1; id<=nSubjects; id++) {
@@ -114,7 +105,10 @@ public class PageRankHDT {
         }
 
         //Compute the page rank
+        System.out.println("Compute the page rank");
+        System.err.println("Iteration...");
         for (int j = 0; j < numberOfIterations; j++) {
+            System.err.print(j +" ");
             for (int k=1; k<=nShared+numberNonLiterals; k++){
                 int id = k;
                 if (k>nShared){
@@ -132,9 +126,6 @@ public class PageRankHDT {
                         pageRankIn = startValue;
                     }
                     long numberOut = numberOutgoing[inLink.getSubject()];
-//                    System.out.println("dampingFactor "+dampingFactor);
-//                    System.out.println("pageRankIn "+pageRankIn);
-//                    System.out.println("numberOut "+numberOut);
                     pageRank += dampingFactor * (pageRankIn / numberOut);
                 }
                 if (id<=nShared){
@@ -143,11 +134,14 @@ public class PageRankHDT {
                     pageRankScoresObjects[k-nShared-1]=pageRank;
                 }
             }
-
         }
+        System.out.println("\n");
     }
 
     public List<Score> getPageRankScores() {
+        int nShared = (int) hdt.getDictionary().getNshared();
+        int nSubjects = (int) hdt.getDictionary().getNsubjects();
+        int nObjects= (int) hdt.getDictionary().getNobjects();
         List<Score> scores = new ArrayList<Score>();
         for (int id=1; id<=nShared; id++){
             Score s = new Score();
@@ -155,7 +149,7 @@ public class PageRankHDT {
             s.pageRank =  pageRankScoresShared[id];
             scores.add(s);
         }
-        for (int k=0; k<numberNonLiterals; k++){
+        for (int k=0; k<indexesNonLiterals.size(); k++){
             int id = indexesNonLiterals.get(k);
             Score s = new Score();
             s.node = hdt.getDictionary().idToString(id,TripleComponentRole.OBJECT).toString();
@@ -173,21 +167,19 @@ public class PageRankHDT {
     }
 
     public void printPageRankScores(){
+        int nShared = (int) hdt.getDictionary().getNshared();
+        int nSubjects = (int) hdt.getDictionary().getNsubjects();
+        int nObjects= (int) hdt.getDictionary().getNobjects();
         for (int id=1; id<=nShared; id++){
             System.out.println(hdt.getDictionary().idToString(id,TripleComponentRole.SUBJECT) + "\t" + pageRankScoresShared[id]);
         }
-        for (int k=0; k<numberNonLiterals; k++){
+        for (int k=0; k<indexesNonLiterals.size(); k++){
             int id = indexesNonLiterals.get(k);
             System.out.println(hdt.getDictionary().idToString(id,TripleComponentRole.OBJECT) + "\t" + pageRankScoresObjects[k]);
         }
         for (int id=1; id<=(nSubjects-nShared); id++){
             System.out.println(hdt.getDictionary().idToString(id+nShared,TripleComponentRole.SUBJECT) + "\t" + startValue);
         }
-    }
-
-    public class Score{
-        public String node;
-        public Double pageRank;
     }
 
 }

@@ -61,7 +61,6 @@ class Main {
     }
 
     public void run() {
-        System.out.println(help);
         try {
             PageRank pr = null;
             if (input.endsWith(".hdt")){

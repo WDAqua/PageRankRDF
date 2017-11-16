@@ -188,14 +188,14 @@ public class PageRankHDT implements PageRank{
         int nSubjects = (int) hdt.getDictionary().getNsubjects();
         int nObjects= (int) hdt.getDictionary().getNobjects();
         for (int id=1; id<=nShared; id++){
-            writer.println("<"+hdt.getDictionary().idToString(id,TripleComponentRole.SUBJECT)+"> <http://purl.org/voc/vrank#hasRank>\t [<http://purl.org/voc/vrank#rankValue>\t\""+String.format("%.10f", pageRankScoresShared[id])+"\"^^<http://www.w3.org/2001/XMLSchema#float>] .");
+            writer.println("<"+hdt.getDictionary().idToString(id,TripleComponentRole.SUBJECT)+"> <http://purl.org/voc/vrank#pagerank>\t \""+String.format("%.10f", pageRankScoresShared[id])+"\"^^<http://www.w3.org/2001/XMLSchema#float> .");
         }
         for (int k=0; k<indexesNonLiterals.size(); k++){
             int id = indexesNonLiterals.get(k);
-            writer.println("<"+hdt.getDictionary().idToString(id,TripleComponentRole.OBJECT)+"> <http://purl.org/voc/vrank#hasRank>\t [<http://purl.org/voc/vrank#rankValue>\t\""+String.format("%.10f",pageRankScoresObjects[k])+"\"^^<http://www.w3.org/2001/XMLSchema#float>] .");
+            writer.println("<"+hdt.getDictionary().idToString(id,TripleComponentRole.OBJECT)+"> <http://purl.org/voc/vrank#pagerank>\t \""+String.format("%.10f",pageRankScoresObjects[k])+"\"^^<http://www.w3.org/2001/XMLSchema#float> .");
         }
         for (int id=1; id<=(nSubjects-nShared); id++){
-            writer.println("<"+hdt.getDictionary().idToString(id+nShared,TripleComponentRole.SUBJECT)+"> <http://purl.org/voc/vrank#hasRank>\t [<http://purl.org/voc/vrank#rankValue>\t\""+String.format("%.10f",startValue)+"\"^^<http://www.w3.org/2001/XMLSchema#float>] .");
+            writer.println("<"+hdt.getDictionary().idToString(id+nShared,TripleComponentRole.SUBJECT)+"> <http://purl.org/voc/vrank#pagerank>\t \""+String.format("%.10f",startValue)+"\"^^<http://www.w3.org/2001/XMLSchema#float> .");
         }
     }
 }

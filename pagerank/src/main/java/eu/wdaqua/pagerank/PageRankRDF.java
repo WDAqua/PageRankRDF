@@ -110,7 +110,7 @@ public class PageRankRDF implements PageRank{
         List<PageRankScore> scores = new ArrayList<PageRankScore>();
         Set<String> keysetNew = pageRankScores.keySet();
         for (String string : keysetNew) {
-            writer.println(string + "\t" + pageRankScores.get(string));
+            writer.println(string + "\t" + String.format("%.10f", pageRankScores.get(string)));
         }
     }
 
@@ -118,7 +118,7 @@ public class PageRankRDF implements PageRank{
         List<PageRankScore> scores = new ArrayList<PageRankScore>();
         Set<String> keysetNew = pageRankScores.keySet();
         for (String string : keysetNew) {
-            writer.println("<"+string+"> <http://purl.org/voc/vrank#hasRank>\t [<http://purl.org/voc/vrank#rankValue>\t\""+pageRankScores.get(string)+"\"^^<http://www.w3.org/2001/XMLSchema#float>] .");
+            writer.println("<"+string+"> <http://purl.org/voc/vrank#hasRank>\t [<http://purl.org/voc/vrank#rankValue>\t\""+String.format("%.10f", pageRankScores.get(string))+"\"^^<http://www.w3.org/2001/XMLSchema#float>] .");
         }
     }
 }

@@ -3,12 +3,17 @@ package edu.kit.aifb.summarizer;
 import org.openrdf.model.Literal;
 import org.openrdf.query.Binding;
 import org.openrdf.query.BindingSet;
+import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
 import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sparql.SPARQLRepository;
+import org.springframework.stereotype.Component;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -21,7 +26,10 @@ import edu.kit.aifb.model.URI;
  * This abstract class needs to be implemented by each entity summarization system.
  *
  */
+@Component
 public abstract class Summarizer {
+
+	public abstract String getName();
 
 	// method that returns the SPARQL endpoint of the corresponding knowledgebase
 	public abstract String getRepository();
@@ -36,50 +44,50 @@ public abstract class Summarizer {
 	// number of objects to consider
 	public abstract String getQuery1();
 
+	public abstract String getQuery1b();
+
 	// method returns a SPARQL query for retriving the label of the predicate
 	public abstract String getQuery2();
 
-	public LinkedList<TripleMeta> summarize(java.net.URI uri, String[] fixedProperties,
-											Integer topK, Integer maxHops, String language){
-		SPARQLRepository rep = new SPARQLRepository(this.getRepository());
-
-		if (language == null) {
-			language = "en";
-		}
-
-		if (fixedProperties == null) {
-			fixedProperties = new String [0];
-		}
-
-		RepositoryConnection con = null;
-
-
-		LinkedList<TripleMeta> result = new LinkedList<TripleMeta>();
+	private URI getLableEntity(RepositoryConnection con, java.net.URI uri, String language){
+		URI subject = null;
 		try {
-			rep.initialize();
-			con = rep.getConnection();
 			TupleQuery q1 = con.prepareTupleQuery(QueryLanguage.SPARQL, this.getQuery0().replace("ENTITY", uri.toString()).replace("LANG", language));
-			TupleQueryResult r1 = q1.evaluate();
-			URI subject = null;
+			System.out.println(q1.toString());
+			TupleQueryResult r1 = null;
+			r1 = q1.evaluate();
 			if (r1.hasNext()) {
-				BindingSet set = r1.next();
-				Binding l = set.getBinding("l");
-				System.out.println(l.toString());
-				if (l == null) {
-					subject = new URI(uri);
-				} else {
-					String langTag = "en";
-					if (((Literal) l.getValue()).getLanguage()!=null){
-						langTag = ((Literal) l.getValue()).getLanguage();
-					}
-					subject = new URI(uri, l.getValue().stringValue(), langTag);
-				}
+                BindingSet set = r1.next();
+                Binding l = set.getBinding("l");
+                System.out.println(l.toString());
+                if (l == null) {
+                    subject = new URI(uri);
+                } else {
+                    String langTag = "en";
+                    if (((Literal) l.getValue()).getLanguage()!=null){
+                        langTag = ((Literal) l.getValue()).getLanguage();
+                    }
+                    subject = new URI(uri, l.getValue().stringValue(), langTag);
+                }
 
-			}
+            }
 			r1.close();
-			String query1 = this.getQuery1().replace("ENTITY", uri.toString()).
-					replace("LANG", language).
-					replace("TOPK", Integer.toString(topK));
+		} catch (QueryEvaluationException e) {
+			e.printStackTrace();
+		} catch (RepositoryException e) {
+			e.printStackTrace();
+		} catch (MalformedQueryException e) {
+			e.printStackTrace();
+		}
+		return subject;
+	}
+
+	private ArrayList<ObjectRank> getObjects(RepositoryConnection con, java.net.URI uri, String query, String language, int topK, String[] fixedProperties){
+		ArrayList<ObjectRank> objects = new ArrayList<ObjectRank>();
+		String query1 = query.replace("ENTITY", uri.toString()).
+				replace("LANG", language).
+				replace("TOPK", Integer.toString(topK));
+		try {
 			if (fixedProperties.length > 0) {
 				String replacement = "FILTER (";
 				for (String string : fixedProperties) {
@@ -91,58 +99,128 @@ public abstract class Summarizer {
 			} else {
 				query1 = query1.replaceAll("PREDICATES", "");
 			}
-			System.out.println("Query 1"+query1);
 			TupleQuery q2 = con.prepareTupleQuery(QueryLanguage.SPARQL, query1);
-
 			TupleQueryResult r2 = q2.evaluate();
-			ArrayList<URI> objects = new ArrayList<URI>();
+
 			while (r2.hasNext()) {
 				BindingSet set = r2.next();
 				Binding o = set.getBinding("o");
 				Binding l = set.getBinding("l");
-				URI object = null;
+				Binding rank = set.getBinding("pageRank");
+				ObjectRank object = new ObjectRank();
 				if (o != null && l == null) {
-					object = new URI(new java.net.URI(o.getValue().toString()));
-					objects.add(object);
+					object.object = new URI(new java.net.URI(o.getValue().toString()));
 				} else  if (o != null && l != null){
-					object = new URI(new java.net.URI(o.getValue().toString()), l.getValue().stringValue(), ((Literal) l.getValue()).getLanguage());
-					objects.add(object);
+					object.object = new URI(new java.net.URI(o.getValue().toString()), l.getValue().stringValue(), ((Literal) l.getValue()).getLanguage());
 				}
+				if (rank != null){
+					object.rank = new Double(rank.getValue().stringValue());
+				}
+				objects.add(object);
 			}
 			r2.close();
+		} catch (QueryEvaluationException e) {
+			e.printStackTrace();
+		} catch (MalformedQueryException e) {
+			e.printStackTrace();
+		} catch (RepositoryException e) {
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+		return objects;
+	}
 
-			for (URI object : objects) {
-				TupleQuery q3 = con.prepareTupleQuery(QueryLanguage.SPARQL,
-						this.getQuery2().replace("ENTITY", uri.toString()).
-								replace("LANG", language).
-								replace("OBJECT", object.getURI().toString()));
-				TupleQueryResult r3 = q3.evaluate();
-				System.out.println(q3);
-				if (r3.hasNext()) {
-					BindingSet set = r3.next();
-					Binding p = set.getBinding("p");
-					Binding l = set.getBinding("l");
-					Binding rank = set.getBinding("rank");
+	private Property getPredicate(RepositoryConnection con, java.net.URI uri, String language, ObjectRank object) {
+		Property predicate = null;
+		TupleQuery q3 = null;
+		try {
+			q3 = con.prepareTupleQuery(QueryLanguage.SPARQL,
+                    this.getQuery2().replace("ENTITY", uri.toString()).
+                            replace("LANG", language).
+                            replace("OBJECT", object.object.getURI().toString()));
 
-					Property predicate = null;
-					if (l == null) {
-						predicate = new Property(new java.net.URI(p.getValue().stringValue()));
+			TupleQueryResult r3 = q3.evaluate();
+			System.out.println(q3);
+			if (r3.hasNext()) {
+				BindingSet set = r3.next();
+				Binding p = set.getBinding("p");
+				Binding l = set.getBinding("l");
+				Binding rank = set.getBinding("rank");
+
+
+				if (l == null) {
+					if (this.getName().equals("freebase")) { //hack to make it work over freebase where there are no labels for the properties, bad usage of RDF standards
+						String label = p.getValue().stringValue();
+						label = label.substring(label.lastIndexOf(".") + 1, label.length());
+						predicate = new Property(new java.net.URI(p.getValue().stringValue()), label);
 
 					} else {
-						predicate = new Property(new java.net.URI(p.getValue().stringValue()),
-								l.getValue().stringValue());
+						predicate = new Property(new java.net.URI(p.getValue().stringValue()));
 					}
 
-					TripleMeta meta = new TripleMeta(subject, predicate, object, TripleMeta.TripleFocus.subject);
-					meta.setRank(new Double(rank.getValue().stringValue()));
-					result.add(meta);
+
+				} else {
+					predicate = new Property(new java.net.URI(p.getValue().stringValue()),
+							l.getValue().stringValue());
 				}
-				r3.close();
+			}
+			r3.close();
+		} catch (RepositoryException e) {
+			e.printStackTrace();
+		} catch (MalformedQueryException e1) {
+			e1.printStackTrace();
+		} catch (QueryEvaluationException e1) {
+			e1.printStackTrace();
+		} catch (URISyntaxException e1) {
+			e1.printStackTrace();
+		}
+		return predicate;
+	}
+
+	public LinkedList<TripleMeta> summarize(java.net.URI uri, String[] fixedProperties,
+											Integer topK, Integer maxHops, String language){
+		SPARQLRepository rep = new SPARQLRepository(this.getRepository());
+
+		if (fixedProperties == null) {
+			fixedProperties = new String [0];
+		}
+
+		RepositoryConnection con = null;
+
+		LinkedList<TripleMeta> result = new LinkedList<TripleMeta>();
+		try {
+			rep.initialize();
+			con = rep.getConnection();
+			//Retriving the label of uri
+			URI subject = getLableEntity(con,uri,language);
+
+			//Retrive the TopK objects, i.e. the objects with k-th top page rank
+			//Retrive ouitgoing links
+			ArrayList<ObjectRank> objects = new ArrayList<ObjectRank>();
+			objects = getObjects(con, uri, this.getQuery1(), language, topK, fixedProperties);
+			ArrayList<ObjectRank> objects_rev = new ArrayList<ObjectRank>();
+			//If needed (and possible) add ingoing links
+			if (objects.size()<topK && this.getQuery1b()!=null){ // go here only if not enough entities have been found
+				objects_rev = getObjects(con, uri, this.getQuery1b(), language, topK, fixedProperties);
 			}
 
+			//Retrive for the TopK objects, the properties connecting them to the objects together with the label
+			for (ObjectRank object : objects) {
+				Property predicate = getPredicate(con, uri, language, object);
+				//Add the found informations to the model
+				TripleMeta meta = new TripleMeta(subject, predicate, object.object, TripleMeta.TripleFocus.subject);
+				meta.setRank(new Double(object.rank));
+				result.add(meta);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return result;
+	}
+
+	class ObjectRank {
+		public URI object;
+		public double rank;
 	}
 }

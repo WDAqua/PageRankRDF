@@ -1,8 +1,15 @@
 package edu.kit.aifb.summarizer.implemented;
 
+import org.springframework.stereotype.Component;
+
 import edu.kit.aifb.summarizer.Summarizer;
 
+@Component
 public class DBLP extends Summarizer {
+
+	public String getName() {
+		return "dblp";
+	}
 
 	public String getRepository(){
 		return "https://wdaqua.univ-st-etienne.fr/hdt-endpoint/dblp/sparql";
@@ -22,6 +29,10 @@ public class DBLP extends Summarizer {
 				+ "FILTER (lang(?lable)=\"en\" || lang(?label)=\"\"). "
 				+ "}"
 				+ "GROUP BY ?o ORDER BY DESC (?pageRank) LIMIT TOPK";
+	}
+
+	public String getQuery1b(){
+		return null;
 	}
 
 	public String getQuery2(){

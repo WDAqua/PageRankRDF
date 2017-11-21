@@ -182,44 +182,46 @@ public class WebController {
         }
 
         Summarizer summarizer = null;
+        boolean found = false;
         for (Summarizer s : summerizer){
-            boolean found = false;
+
             if (s.getName().equals(kb)){
                 summarizer = s;
                 found = true;
             }
-            if (!found){
-                logger.info("No summerizer found for endpoint {}",kb);
+
+        }
+        if (!found){
+            logger.info("No summerizer found for endpoint {}",kb);
+        } else {
+
+            List<TripleMeta> res = null;
+            java.net.URI uri = null;
+            try {
+                uri = new java.net.URI(entity);
+
+                res = summarizer.summarize(uri, fixedProperties, topK, maxHops, language);
+
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
             }
-        }
 
-
-        List<TripleMeta> res = null;
-        java.net.URI uri = null;
-        try {
-            uri = new java.net.URI(entity);
-
-            res = summarizer.summarize(uri, fixedProperties, topK, maxHops, language);
-
-        } catch (NullPointerException e){
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-
-        Model result = createModel(entity, topK, maxHops, fixedProperties, language, res);
-        String r = result.filter(null, RDF.TYPE,f.createURI(SUMMARY)).subjects().iterator().next().stringValue();
-        StringWriter writer = new StringWriter();
-        try {
-            Rio.write(result, writer, outputFormat);
-            String s = writer.toString();
-            return ResponseEntity.created(new java.net.URI(r)).header("Content-Type", mime).
-                    header("Access-Control-Allow-Origin", "*").header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-                    .body(s);
-        } catch (RDFHandlerException e) {
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
+            Model result = createModel(entity, topK, maxHops, fixedProperties, language, res);
+            String r = result.filter(null, RDF.TYPE, f.createURI(SUMMARY)).subjects().iterator().next().stringValue();
+            StringWriter writer = new StringWriter();
+            try {
+                Rio.write(result, writer, outputFormat);
+                String s = writer.toString();
+                return ResponseEntity.created(new java.net.URI(r)).header("Content-Type", mime).
+                        header("Access-Control-Allow-Origin", "*").header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+                        .body(s);
+            } catch (RDFHandlerException e) {
+                e.printStackTrace();
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
         }
         return null;
     }

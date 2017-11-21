@@ -11,7 +11,6 @@ import org.openrdf.query.TupleQueryResult;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sparql.SPARQLRepository;
-import org.springframework.stereotype.Component;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -26,7 +25,6 @@ import edu.kit.aifb.model.URI;
  * This abstract class needs to be implemented by each entity summarization system.
  *
  */
-@Component
 public abstract class Summarizer {
 
 	public abstract String getName();

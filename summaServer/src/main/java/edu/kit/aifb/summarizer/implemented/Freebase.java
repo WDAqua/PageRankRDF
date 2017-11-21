@@ -28,7 +28,7 @@ public class Freebase extends Summarizer {
 
 	public String getQuery1(){
 		return "PREFIX vrank:<http://purl.org/voc/vrank#> " +
-				"SELECT DISTINCT ?o ?l " +
+				"SELECT DISTINCT ?o ?l ?pageRank " +
 				"WHERE { " +
 				"<ENTITY> ?p ?o . " +
 				"PREDICATES" +
@@ -51,13 +51,15 @@ public class Freebase extends Summarizer {
 
 	public String getQuery2() {
 		return "PREFIX vrank:<http://purl.org/voc/vrank#>"
-				+ "SELECT ?p ?l ?rank "
+				+ "SELECT ?p ?l "
 				+ "WHERE {"
 				+ "<ENTITY> ?p <OBJECT> ."
-				+ "graph <http://freebase.com/pageRank> { "
-				+ "<OBJECT> <http://purl.org/voc/vrank#pagerank> ?rank . "
-				+ "} "
 				+ "OPTIONAL {?p <http://www.w3.org/2000/01/rdf-schema#label> ?l . "
 				+ "FILTER regex(lang(?l), \"LANG\", \"i\")} } ORDER BY asc(?p) ";
 	}
+
+	public String getQuery2b(){
+		return null;
+	}
+
 }

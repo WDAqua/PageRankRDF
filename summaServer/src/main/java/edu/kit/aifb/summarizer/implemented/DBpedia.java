@@ -51,4 +51,9 @@ public class DBpedia extends Summarizer {
 				+ "OPTIONAL {?p <http://www.w3.org/2000/01/rdf-schema#label> ?l."
 				+ "FILTER regex(lang(?l), \"LANG\", \"i\")} } ORDER BY asc(?p)";
 	}
+
+	public String getQuery2b(){
+		return null;
+	}
+
 }

@@ -49,4 +49,9 @@ public class MusicBrainz extends Summarizer {
 				+ "OPTIONAL {?p <http://www.w3.org/2000/01/rdf-schema#label> ?l. } "
 				+ "} ORDER BY asc(?p)";
 	}
+
+	public String getQuery2b(){
+		return null;
+	}
+
 }

@@ -22,8 +22,8 @@ public class DBLP extends Summarizer {
 
 	public String getQuery1(){
 		return "PREFIX vrank:<http://purl.org/voc/vrank#> "
-				+ "SELECT DISTINCT ?o (SAMPLE(?label) as ?l) "
-				+ "{<ENTITY> ?p ?o . ?o vrank:hasRank/vrank:rankValue ?pageRank. "
+				+ "SELECT DISTINCT ?o (SAMPLE(?label) as ?l) (SAMPLE(?rank) as ?pageRank) "
+				+ "{<ENTITY> ?p ?o . ?o vrank:hasRank/vrank:rankValue ?rank. "
 				+ "PREDICATES"
 				+ "OPTIONAL {?o <http://www.w3.org/2000/01/rdf-schema#label> ?label . } "
 				+ "FILTER (lang(?lable)=\"en\" || lang(?label)=\"\"). "
@@ -32,16 +32,33 @@ public class DBLP extends Summarizer {
 	}
 
 	public String getQuery1b(){
-		return null;
+		return "PREFIX vrank:<http://purl.org/voc/vrank#> "
+				+ "SELECT DISTINCT ?o (SAMPLE(?label) as ?l)  (SAMPLE(?rank) as ?pageRank) "
+				+ "{?o ?p <ENTITY> . ?o vrank:hasRank/vrank:rankValue ?rank. "
+				+ "PREDICATES"
+				+ "OPTIONAL {?o <http://www.w3.org/2000/01/rdf-schema#label> ?label . } "
+				+ "FILTER (lang(?lable)=\"en\" || lang(?label)=\"\"). "
+				+ "}"
+				+ "GROUP BY ?o ORDER BY DESC (?pageRank) LIMIT TOPK";
 	}
 
 	public String getQuery2(){
 		return "PREFIX vrank:<http://purl.org/voc/vrank#>"
-				+ "SELECT ?p ?l ?rank "
+				+ "SELECT ?p ?l "
 				+ "WHERE { "
 				+ "<ENTITY> ?p <OBJECT> . "
-				+ "<OBJECT> vrank:hasRank/vrank:rankValue ?rank . "
-				+ "OPTIONAL {?p <http://www.w3.org/2000/01/rdf-schema#label> ?l. } "
+				+ "OPTIONAL {?p <http://www.w3.org/2000/01/rdf-schema#label> ?l . "
+				+ "FILTER regex(lang(?l), \"LANG\", \"i\")} "
+				+ "} ORDER BY asc(?p)";
+	}
+
+	public String getQuery2b(){
+		return "PREFIX vrank:<http://purl.org/voc/vrank#>"
+				+ "SELECT ?p ?l "
+				+ "WHERE { "
+				+ "<OBJECT> ?p <ENTITY> . "
+				+ "OPTIONAL {?p <http://www.w3.org/2000/01/rdf-schema#label> ?l . "
+				+ "FILTER regex(lang(?l), \"LANG\", \"i\")} "
 				+ "} ORDER BY asc(?p)";
 	}
 }

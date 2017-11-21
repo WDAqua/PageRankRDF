@@ -11,11 +11,14 @@ import org.openrdf.query.TupleQueryResult;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sparql.SPARQLRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+import edu.kit.aifb.WebController;
 import edu.kit.aifb.model.Property;
 import edu.kit.aifb.model.TripleMeta;
 import edu.kit.aifb.model.URI;
@@ -27,6 +30,7 @@ import edu.kit.aifb.model.URI;
  */
 public abstract class Summarizer {
 
+	private static final Logger logger = LoggerFactory.getLogger(Summarizer.class);
 	public abstract String getName();
 
 	// method that returns the SPARQL endpoint of the corresponding knowledgebase
@@ -47,17 +51,20 @@ public abstract class Summarizer {
 	// method returns a SPARQL query for retriving the label of the predicate
 	public abstract String getQuery2();
 
+	public abstract String getQuery2b();
+
 	private URI getLableEntity(RepositoryConnection con, java.net.URI uri, String language){
+		String query = this.getQuery0().replace("ENTITY", uri.toString()).replace("LANG", language);
+		logger.info("Query to find the label of the subject {}",query);
 		URI subject = null;
 		try {
-			TupleQuery q1 = con.prepareTupleQuery(QueryLanguage.SPARQL, this.getQuery0().replace("ENTITY", uri.toString()).replace("LANG", language));
-			System.out.println(q1.toString());
+			TupleQuery q1 = con.prepareTupleQuery(QueryLanguage.SPARQL, query);
+			logger.info("Query to find the predicate {}",q1.toString());
 			TupleQueryResult r1 = null;
 			r1 = q1.evaluate();
 			if (r1.hasNext()) {
                 BindingSet set = r1.next();
                 Binding l = set.getBinding("l");
-                System.out.println(l.toString());
                 if (l == null) {
                     subject = new URI(uri);
                 } else {
@@ -82,9 +89,10 @@ public abstract class Summarizer {
 
 	private ArrayList<ObjectRank> getObjects(RepositoryConnection con, java.net.URI uri, String query, String language, int topK, String[] fixedProperties){
 		ArrayList<ObjectRank> objects = new ArrayList<ObjectRank>();
-		String query1 = query.replace("ENTITY", uri.toString()).
+		query = query.replace("ENTITY", uri.toString()).
 				replace("LANG", language).
 				replace("TOPK", Integer.toString(topK));
+		logger.info("Query to find the top k objects {}",query.toString());
 		try {
 			if (fixedProperties.length > 0) {
 				String replacement = "FILTER (";
@@ -93,11 +101,11 @@ public abstract class Summarizer {
 				}
 				replacement = replacement.substring(0, replacement.length() - 3);
 				replacement += ") .";
-				query1 = query1.replaceAll("PREDICATES", replacement);
+				query = query.replaceAll("PREDICATES", replacement);
 			} else {
-				query1 = query1.replaceAll("PREDICATES", "");
+				query = query.replaceAll("PREDICATES", "");
 			}
-			TupleQuery q2 = con.prepareTupleQuery(QueryLanguage.SPARQL, query1);
+			TupleQuery q2 = con.prepareTupleQuery(QueryLanguage.SPARQL, query);
 			TupleQueryResult r2 = q2.evaluate();
 
 			while (r2.hasNext()) {
@@ -105,16 +113,17 @@ public abstract class Summarizer {
 				Binding o = set.getBinding("o");
 				Binding l = set.getBinding("l");
 				Binding rank = set.getBinding("pageRank");
-				ObjectRank object = new ObjectRank();
+				ObjectRank objectRank = null;
 				if (o != null && l == null) {
-					object.object = new URI(new java.net.URI(o.getValue().toString()));
+					objectRank = new ObjectRank( new URI(new java.net.URI(o.getValue().toString())), new Double(rank.getValue().stringValue()));
 				} else  if (o != null && l != null){
-					object.object = new URI(new java.net.URI(o.getValue().toString()), l.getValue().stringValue(), ((Literal) l.getValue()).getLanguage());
+					URI tmp = new URI(new java.net.URI(o.getValue().toString()), l.getValue().stringValue(), ((Literal) l.getValue()).getLanguage());
+					objectRank = new ObjectRank( tmp, new Double(rank.getValue().stringValue()));
 				}
-				if (rank != null){
-					object.rank = new Double(rank.getValue().stringValue());
+				if (objectRank!=null){
+					objects.add(objectRank);
 				}
-				objects.add(object);
+
 			}
 			r2.close();
 		} catch (QueryEvaluationException e) {
@@ -129,24 +138,22 @@ public abstract class Summarizer {
 		return objects;
 	}
 
-	private Property getPredicate(RepositoryConnection con, java.net.URI uri, String language, ObjectRank object) {
+	private Property getPredicate(RepositoryConnection con, java.net.URI uri, String query, String language, ObjectRank object) {
+		query = query.replace("ENTITY", uri.toString()).
+				replace("LANG", language).
+				replace("OBJECT", object.uri.getURI().toString());
+		logger.info("Query to find the predicate {}",query);
 		Property predicate = null;
 		TupleQuery q3 = null;
 		try {
-			q3 = con.prepareTupleQuery(QueryLanguage.SPARQL,
-                    this.getQuery2().replace("ENTITY", uri.toString()).
-                            replace("LANG", language).
-                            replace("OBJECT", object.object.getURI().toString()));
 
+			q3 = con.prepareTupleQuery(QueryLanguage.SPARQL, query);
+			logger.info("Query to find the predicate {}",query);
 			TupleQueryResult r3 = q3.evaluate();
-			System.out.println(q3);
 			if (r3.hasNext()) {
 				BindingSet set = r3.next();
 				Binding p = set.getBinding("p");
 				Binding l = set.getBinding("l");
-				Binding rank = set.getBinding("rank");
-
-
 				if (l == null) {
 					if (this.getName().equals("freebase")) { //hack to make it work over freebase where there are no labels for the properties, bad usage of RDF standards
 						String label = p.getValue().stringValue();
@@ -163,7 +170,7 @@ public abstract class Summarizer {
 							l.getValue().stringValue());
 				}
 			}
-			r3.close();
+			//r3.close();
 		} catch (RepositoryException e) {
 			e.printStackTrace();
 		} catch (MalformedQueryException e1) {
@@ -205,9 +212,16 @@ public abstract class Summarizer {
 
 			//Retrive for the TopK objects, the properties connecting them to the objects together with the label
 			for (ObjectRank object : objects) {
-				Property predicate = getPredicate(con, uri, language, object);
+				Property predicate = getPredicate(con, uri, this.getQuery2(), language, object);
 				//Add the found informations to the model
-				TripleMeta meta = new TripleMeta(subject, predicate, object.object, TripleMeta.TripleFocus.subject);
+				TripleMeta meta = new TripleMeta(subject, predicate, object.uri, TripleMeta.TripleFocus.subject);
+				meta.setRank(new Double(object.rank));
+				result.add(meta);
+			}
+			for (ObjectRank object : objects_rev) {
+				Property predicate = getPredicate(con, uri, this.getQuery2b(),language, object);
+				//Add the found informations to the model
+				TripleMeta meta = new TripleMeta(subject, predicate, object.uri, TripleMeta.TripleFocus.subject);
 				meta.setRank(new Double(object.rank));
 				result.add(meta);
 			}
@@ -218,7 +232,12 @@ public abstract class Summarizer {
 	}
 
 	class ObjectRank {
-		public URI object;
+		public URI uri;
 		public double rank;
+
+		public ObjectRank(URI uri, double rank){
+			this.uri = uri;
+			this.rank = rank;
+		}
 	}
 }

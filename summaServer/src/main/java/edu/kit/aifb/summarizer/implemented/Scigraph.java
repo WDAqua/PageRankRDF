@@ -28,7 +28,9 @@ public class Scigraph extends Summarizer {
 				"WHERE { " +
 				"<ENTITY> ?p ?o . " +
 				"PREDICATES " +
+				"FILTER (?p != <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ) " +
 				"OPTIONAL {?o <http://www.w3.org/2004/02/skos/core#altLabel> ?l . }" +
+				"OPTIONAL {?o <http://www.w3.org/2004/02/skos/core#prefLabel> ?l . }" +
 				"OPTIONAL {?o <http://scigraph.springernature.com/ontologies/core/publishedName> ?l } " +
 				"OPTIONAL {?o <http://scigraph.springernature.com/ontologies/core/title> ?l } " +
 				"graph <http://scigraph.com/pageRank> { " +
@@ -44,6 +46,7 @@ public class Scigraph extends Summarizer {
 				"?o ?p <ENTITY> . " +
 				"PREDICATES " +
 				"OPTIONAL {?o <http://www.w3.org/2004/02/skos/core#altLabel> ?l . }" +
+				"OPTIONAL {?o <http://www.w3.org/2004/02/skos/core#prefLabel> ?l . }" +
 				"OPTIONAL {?o <http://scigraph.springernature.com/ontologies/core/publishedName> ?l } " +
 				"OPTIONAL {?o <http://scigraph.springernature.com/ontologies/core/title> ?l }} " +
 				"graph <http://scigraph.com/pageRank> { " +

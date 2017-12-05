@@ -1,6 +1,7 @@
 package edu.kit.aifb;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.ws.Response;
 
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
@@ -24,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -78,8 +80,9 @@ public class WebController {
         this.summerizer = summerizer;
     }
 
-    @RequestMapping(method = RequestMethod.POST, value="/sum")
+    @RequestMapping(method = RequestMethod.POST, value="{kb}/sum")
     public ResponseEntity<?> summaPost(
+            @PathVariable(value="kb") String kb,
             @RequestHeader("Content-Type") String inputMime,
             @RequestHeader("Accept") String outputMime,
             @RequestBody String message){
@@ -104,20 +107,15 @@ public class WebController {
             Integer topK = Integer.parseInt(model.filter(null, f.createURI(TOP_K), null).objectValue().stringValue());
 
             Model maxHopsMod = model.filter(null, f.createURI(MAX_HOPS), null);
-            Integer maxHops = null;
+            Integer maxHops = 1;
             if (!maxHopsMod.isEmpty()) {
                 maxHops = Integer.parseInt(maxHopsMod.objectValue().stringValue());
             }
 
-            String language = null;
+            String language = "";
             Model languageMod = model.filter(null, f.createURI(LANGUAGE), null);
             if (!languageMod.isEmpty()) {
                 language = languageMod.objectValue().stringValue();
-            }
-            String kb = null;
-            Model kbMod = model.filter(null, f.createURI(KB), null);
-            if (!kbMod.isEmpty()) {
-                kb = kbMod.objectValue().stringValue();
             }
             Model m = model.filter(null, f.createURI(FIXED_PROPERTY), null);
             Set<Value> objects = m.objects();
@@ -142,20 +140,19 @@ public class WebController {
     }
 
 
-    @RequestMapping(method = RequestMethod.OPTIONS, value="/sum")
+    @RequestMapping(method = RequestMethod.OPTIONS, value="{kb}/sum")
     public ResponseEntity<?> getOptions() {
         return ResponseEntity.ok().header("Access-Control-Allow-Origin", "*").header("Access-Control-Allow-Methods", "GET, POST, OPTIONS").build();
     }
 
-
-    @RequestMapping(method = RequestMethod.GET, value="/sum")
-    public ResponseEntity<?> summa(@RequestParam(value="entity") String entity,
+    @RequestMapping(method = RequestMethod.GET, value="{kb}/sum")
+    public ResponseEntity<?> summa(@PathVariable(value="kb") String kb,
+                        @RequestParam(value="entity") String entity,
                         @RequestParam(value="topK", defaultValue = "5") Integer topK,
                         @RequestParam(value="maxHops", defaultValue = "1") Integer maxHops,
                         @RequestParam(value="fixedProperty", defaultValue ="") String fixedProperty,
                         @RequestParam(value="language", defaultValue = "en") String language,
                         @RequestHeader(value="Accept") String header,
-                        @RequestParam(value="kb", defaultValue = "dblp") String kb,
                         @RequestHeader("Accept") String outputMime) {
         RDFFormat outputFormat = Rio.getParserFormatForMIMEType(outputMime.split(",")[0]);
         if (outputFormat == null) {
@@ -165,7 +162,8 @@ public class WebController {
         if (!fixedProperty.equals("")) {
             fixedProperties = fixedProperty.split(",");
         }
-        return executeQuery(entity, topK, maxHops, fixedProperties, language, kb, outputFormat);
+        ResponseEntity<?> r = executeQuery(entity, topK, maxHops, fixedProperties, language, kb, outputFormat);
+        return ResponseEntity.ok(r.getBody());
         //old Response.fromResponse(r).status(200).header("Location", null).build();
     }
 

@@ -54,6 +54,9 @@ public abstract class Summarizer {
 	public abstract String getQuery2b();
 
 	private URI getLableEntity(RepositoryConnection con, java.net.URI uri, String language){
+		System.out.println(this.getQuery0());
+		System.out.println(uri.toString());
+		System.out.println(language.toString());
 		String query = this.getQuery0().replace("ENTITY", uri.toString()).replace("LANG", language);
 		logger.info("Query to find the label of the subject {}",query);
 		URI subject = null;

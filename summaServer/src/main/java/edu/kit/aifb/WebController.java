@@ -65,7 +65,6 @@ public class WebController {
     private static final String TOP_K = "http://purl.org/voc/summa/topK";
     private static final String MAX_HOPS = "http://purl.org/voc/summa/maxHops";
     private static final String LANGUAGE = "http://purl.org/voc/summa/language";
-    private static final String KB = "http://purl.org/voc/summa/kb";
     private static final String STATEMENT = "http://purl.org/voc/summa/statement";
     private static final String FIXED_PROPERTY = "http://purl.org/voc/summa/fixedProperty";
 

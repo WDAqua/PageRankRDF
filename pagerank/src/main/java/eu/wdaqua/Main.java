@@ -63,6 +63,7 @@ class Main {
     public void run() {
         try {
             PageRank pr = null;
+            long startTime = System.nanoTime();
             if (input.endsWith(".hdt")){
                 pr = new PageRankHDT(input, dampingFactor, startValue, numberOfIterations);
                 pr.compute();
@@ -77,6 +78,8 @@ class Main {
                 pr.printPageRankScoresTSV(writer);
             }
             writer.close();
+            long estimatedTime = System.nanoTime() - startTime;
+            System.out.println("The computation took "+estimatedTime);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (UnsupportedEncodingException e) {

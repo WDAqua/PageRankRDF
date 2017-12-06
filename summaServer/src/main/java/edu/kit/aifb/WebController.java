@@ -181,12 +181,10 @@ public class WebController {
         Summarizer summarizer = null;
         boolean found = false;
         for (Summarizer s : summerizer){
-
             if (s.getName().equals(kb)){
                 summarizer = s;
                 found = true;
             }
-
         }
         if (!found){
             logger.info("No summerizer found for endpoint {}",kb);
@@ -205,7 +203,7 @@ public class WebController {
                 e.printStackTrace();
             }
 
-            Model result = createModel(entity, topK, maxHops, fixedProperties, language, res);
+            Model result = createModel(kb, entity, topK, maxHops, fixedProperties, language, res);
             String r = result.filter(null, RDF.TYPE, f.createURI(SUMMARY)).subjects().iterator().next().stringValue();
             StringWriter writer = new StringWriter();
             try {
@@ -223,11 +221,11 @@ public class WebController {
         return null;
     }
 
-    private Model createModel(String entity, Integer topK, Integer maxHops,
+    private Model createModel(String kb, String entity, Integer topK, Integer maxHops,
                               String [] fixedProperty, String language, List<TripleMeta> meta) {
         Model model = new LinkedHashModel();
         ValueFactory f = ValueFactoryImpl.getInstance();
-        String uri = PATH + "?entity=" + entity + "&topK=" + topK;
+        String uri = PATH + "/"+kb+"/sum?entity=" + entity + "&topK=" + topK;
         if (maxHops != null) {
             uri += "&maxHops=" + maxHops;
         }

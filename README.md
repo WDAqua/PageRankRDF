@@ -18,7 +18,7 @@ It currently supports two computation methods. The first can be used to compute 
 
 The second method takes as input a RDF file in hdt format (http://www.rdfhdt.org). Hdt is a compressed format to store RDF. An example usage would be:
 
-    java -jar pagerank.hdt -in input.ttl -out output.nt
+    java -jar pagerank.jar -in input.hdt -out output.nt
     
 The scores can be stored either by default in nt format using the vRank vocabulary. Also a tsv file can be generated.
 

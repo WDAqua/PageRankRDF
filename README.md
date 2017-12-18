@@ -2,7 +2,7 @@
 
 This repository contains a command line tool to compute PageRank scores over RDF graphs. Applying the PageRank algorithm to RDF graphs is not difficult, but doing it in a memory efficient and scalable way is not easy.
 
-The usage is very simple. Compile the prooject:
+The usage is very simple. Compile the project:
 
     mvn clean package
     
@@ -14,7 +14,7 @@ It currently supports two computation methods. The first can be used to compute 
 
     java -jar pagerank.jar -in input.ttl -out output.nt
     
-NOTE: This method is NOT memory efficient. You will need a BIG machine to run this script (depending on the size of your data)
+**NOTE**: This method is **NOT** memory efficient. You will need a **BIG** machine to run this script (depending on the size of your data)
 
 The second method takes as input a RDF file in hdt format (http://www.rdfhdt.org). Hdt is a compressed format to store RDF. An example usage would be:
 

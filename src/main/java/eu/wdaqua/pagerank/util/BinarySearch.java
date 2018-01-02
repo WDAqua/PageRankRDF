@@ -13,21 +13,16 @@ public class BinarySearch {
     public static int first(Dictionary dictionary, int low, int high) {
         if (high >= low) {
             int mid = low + (high - low) / 2;
-            System.out.println("low "+low);
-            System.out.println("high "+high);
-            System.out.println("mid "+mid);
-
-
+//            System.out.println("low "+low);
+//            System.out.println("high "+high);
+//            System.out.println("mid "+mid);
             int c = -1;
             if (mid!=1){
-                System.out.println(dictionary.idToString(mid - 1, TripleComponentRole.OBJECT).toString().subSequence(0, 1));
                 c = comparator.compare("\"", dictionary.idToString(mid - 1, TripleComponentRole.OBJECT).toString().subSequence(0, 1));
             }
-            System.out.println("HERE");
-            System.out.println(dictionary.idToString(mid, TripleComponentRole.OBJECT));
             int c2 = comparator.compare("\"", dictionary.idToString(mid, TripleComponentRole.OBJECT).toString().subSequence(0, 1));
-            System.out.println("c"+c);
-            System.out.println("c2 "+c2);
+//            System.out.println("c"+c);
+//            System.out.println("c2 "+c2);
             if ((mid == 1 || c < 0) && c2 == 0)
                 return mid;
             else if (c > 0)
@@ -42,16 +37,16 @@ public class BinarySearch {
     public static int last(Dictionary dictionary, int low, int high, int n) {
         if (high >= low) {
             int mid = low + (high - low) / 2;
-            System.out.println("low "+low);
-            System.out.println("high "+high);
-            System.out.println("mid "+mid);
+//            System.out.println("low "+low);
+//            System.out.println("high "+high);
+//            System.out.println("mid "+mid);
             int c = -1;
             if (mid!=n) {
                 c = comparator.compare("\"", dictionary.idToString(mid + 1, TripleComponentRole.OBJECT).toString().subSequence(0, 1));
             }
             int c2 = comparator.compare("\"", dictionary.idToString(mid, TripleComponentRole.OBJECT).toString().subSequence(0, 1));
-            System.out.println("c"+c);
-            System.out.println("c2 "+c2);
+//            System.out.println("c"+c);
+//            System.out.println("c2 "+c2);
             if ((mid == n || c < 0) && c2 ==0)
                 return mid;
             else if (c < 0)

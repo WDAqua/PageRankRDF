@@ -27,6 +27,7 @@ public class PageRankHDT implements PageRank{
     private int[] numberOutgoing;
     private double[] pageRankScoresShared;
     private double[] pageRankScoresObjects;
+    //used to identify all literals, since the entries in the dictionary are ordered, an interval suffices
     private int start_literals_objects = -1;
     private int end_literals_objects = -1;
 
@@ -70,14 +71,14 @@ public class PageRankHDT implements PageRank{
         //Save indeces which are not literals, don't do pagerank for literal only for not uris
         NodeDictionary nodeDictionary = new NodeDictionary(hdt.getDictionary());
         int numberNonLiterals = 0;
-        System.out.println(nObjects);
-        for (int i = 1; i<=nShared; i++){
-            System.out.println("DICT "+hdt.getDictionary().idToString(i,TripleComponentRole.OBJECT));
-        }
-        System.out.println("-----");
-        for (int i = nShared+1; i<=nObjects; i++){
-            System.out.println("DICT "+hdt.getDictionary().idToString(i,TripleComponentRole.OBJECT));
-        }
+//        System.out.println(nObjects);
+//        for (int i = 1; i<=nShared; i++){
+//            System.out.println("DICT "+hdt.getDictionary().idToString(i,TripleComponentRole.OBJECT));
+//        }
+//        System.out.println("-----");
+//        for (int i = nShared+1; i<=nObjects; i++){
+//            System.out.println("DICT "+hdt.getDictionary().idToString(i,TripleComponentRole.OBJECT));
+//        }
 
         start_literals_objects = BinarySearch.first(hdt.getDictionary(), nShared+1, nObjects);
         System.out.println("start_literals_objects "+start_literals_objects);
@@ -106,8 +107,8 @@ public class PageRankHDT implements PageRank{
             IteratorTripleID iteratorTripleID = hdt.getTriples().search(new TripleID(id, 0, 0));
             int count = 0;
             while (iteratorTripleID.hasNext()){
-                Node node = nodeDictionary.getNode(iteratorTripleID.next().getObject(),TripleComponentRole.OBJECT);
-                if (!node.isLiteral()){
+                int o = iteratorTripleID.next().getObject();
+                if (o<start_literals_objects || o > end_literals_objects){
                     count++;
                 }
             }

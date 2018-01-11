@@ -2,6 +2,8 @@
 
 This repository contains a command line tool to compute PageRank scores over RDF graphs. Applying the PageRank algorithm to RDF graphs is not difficult, but doing it in a memory efficient and scalable way is not easy.
 
+## Usage
+
 The usage is very simple. Compile the project:
 
     mvn clean package
@@ -44,5 +46,7 @@ The full list of options is:
       --start-value, -S
         specifying the start value for the PageRank computation
         Default: 0.1
-        
+  
+ ## Already comnputed datasets
+  
  The PageRank scores of some popular RDF datasets can be found [HERE](https://figshare.com/projects/PageRank_scores_of_some_RDF_graphs/28119)

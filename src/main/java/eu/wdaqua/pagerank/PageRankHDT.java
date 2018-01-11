@@ -218,7 +218,7 @@ public class PageRankHDT implements PageRank{
                 writer.println("<"+hdt.getDictionary().idToString(id,TripleComponentRole.OBJECT)+"> <http://purl.org/voc/vrank#pagerank>\t \""+String.format("%.10f",pageRankScoresObjects[id])+"\"^^<http://www.w3.org/2001/XMLSchema#float> .");
             }
             if (id > end_literals_objects){
-                writer.println("<"+hdt.getDictionary().idToString(id,TripleComponentRole.OBJECT)+"> <http://purl.org/voc/vrank#pagerank>\t \""+String.format("%.10f",id-(end_literals_objects-start_literals_objects))+"\"^^<http://www.w3.org/2001/XMLSchema#float> .");
+                writer.println("<"+hdt.getDictionary().idToString(id,TripleComponentRole.OBJECT)+"> <http://purl.org/voc/vrank#pagerank>\t \""+String.format("%.10f",pageRankScoresObjects[id-(end_literals_objects-start_literals_objects)])+"\"^^<http://www.w3.org/2001/XMLSchema#float> .");
             }
         }
         for (int id=1; id<=(nSubjects-nShared); id++){

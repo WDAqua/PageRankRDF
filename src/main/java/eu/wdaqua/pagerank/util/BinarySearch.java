@@ -10,9 +10,9 @@ public class BinarySearch {
     private static CharSequenceComparator comparator = new CharSequenceComparator();
 
     //FIRST occurrence of " in the dictionary between the indexes low and high, if not found return -1
-    public static int first(Dictionary dictionary, int low, int high) {
+    public static long first(Dictionary dictionary, long low, long high) {
         if (high >= low) {
-            int mid = low + (high - low) / 2;
+            long mid = low + (high - low) / 2;
 //            System.out.println("low "+low);
 //            System.out.println("high "+high);
 //            System.out.println("mid "+mid);
@@ -34,9 +34,9 @@ public class BinarySearch {
     }
 
     //LAST occurrence of " in the dictionary between the indexes low and high, if not found return -1
-    public static int last(Dictionary dictionary, int low, int high, int n) {
+    public static long last(Dictionary dictionary, long low, long high, long n) {
         if (high >= low) {
-            int mid = low + (high - low) / 2;
+            long mid = low + (high - low) / 2;
 //            System.out.println("low "+low);
 //            System.out.println("high "+high);
 //            System.out.println("mid "+mid);

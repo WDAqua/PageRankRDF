@@ -16,9 +16,18 @@ public class PageRankRDF implements PageRank{
     private static int numberOfIterations = 40;
     private String dump;
     private HashMap<String, Double> pageRankScores = new HashMap();
+    private boolean literals;
 
     public PageRankRDF(String dump){
         this.dump = dump;
+    }
+
+    public PageRankRDF(String dump, double dampingFactor, double startValue, int numberOfIterations, boolean literals){
+        this.dump = dump;
+        this.dampingFactor = dampingFactor;
+        this.startValue = startValue;
+        this.numberOfIterations = numberOfIterations;
+        this.literals = literals;
     }
 
     public PageRankRDF(String dump, double dampingFactor, double startValue, int numberOfIterations){
@@ -26,6 +35,7 @@ public class PageRankRDF implements PageRank{
         this.dampingFactor = dampingFactor;
         this.startValue = startValue;
         this.numberOfIterations = numberOfIterations;
+        this.literals = false;
     }
 
     public void compute() {
@@ -37,7 +47,7 @@ public class PageRankRDF implements PageRank{
         PipedRDFIterator<Triple> iter = Parser.parse(dump);
         while (iter.hasNext()) {
             Triple t = iter.next();
-            if (t.getObject().isURI()){
+            if (literals || t.getObject().isURI()){
                 ArrayList<String> incoming = (ArrayList)((HashMap)incomingPerPage).get(t.getObject().toString());
                 if (incoming == null)
                 {
@@ -65,7 +75,8 @@ public class PageRankRDF implements PageRank{
 
         System.err.println("Computing PageRank: " + numberOfIterations +
                 " iterations, damping factor " + dampingFactor +
-                ", start value " + startValue);
+                ", start value " + startValue +
+                ", considering literals " + literals);
 
         Set<String> keyset = incomingPerPage.keySet();
         System.err.println("Iteration ...");

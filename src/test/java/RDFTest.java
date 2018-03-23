@@ -113,4 +113,27 @@ public class RDFTest {
             assertEquals(result.get(score.node), score.pageRank, 0.01);
         }
     }
+
+    @Test
+    public void go7(){
+        System.out.println("Checking example 7 RDF");
+        ClassLoader classLoader = getClass().getClassLoader();
+        String dump = classLoader.getResource("example7.nt").getFile().toString();
+        PageRankRDF pageRankRDF = new PageRankRDF(dump, 0.85, 0.15 , 20,true);
+        pageRankRDF.compute();
+
+        List<PageRankScore> scores= pageRankRDF.getPageRankScores();
+        HashMap<String,Double> result = new HashMap<String, Double>();
+        result.put("PageA", 0.92);
+        result.put("PageB", 0.41);
+        result.put("PageC", 0.41);
+        result.put("PageD", 0.41);
+        result.put("PageE", 0.22);
+        result.put("PageF", 0.22);
+        result.put("PageG", 0.22);
+        result.put("\"literal 1\"", 0.22);
+        for (PageRankScore score : scores){
+            assertEquals(result.get(score.node), score.pageRank, 0.01);
+        }
+    }
 }

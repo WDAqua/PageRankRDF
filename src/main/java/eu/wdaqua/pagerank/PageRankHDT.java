@@ -29,16 +29,26 @@ public class PageRankHDT implements PageRank{
     //used to identify all literals, since the entries in the dictionary are ordered, an interval suffices
     private long start_literals_objects = -1;
     private long end_literals_objects = -1;
+    private boolean literals;
 
     public PageRankHDT(String hdtDump){
         this.load(hdtDump);
     }
 
-    public PageRankHDT(String hdtDump, double dampingFactor, double startValue,  int numberOfIterations){
+    public PageRankHDT(String hdtDump, double dampingFactor, double startValue,  int numberOfIterations, boolean literals){
         this.load(hdtDump);
         this.dampingFactor = dampingFactor;
         this.startValue = startValue;
         this.numberOfIterations = numberOfIterations;
+        this.literals = literals;
+    }
+
+    public PageRankHDT(HDT hdt, double dampingFactor, double startValue, int numberOfIterations, boolean literals){
+        this.hdt = hdt;
+        this.dampingFactor = dampingFactor;
+        this.startValue = startValue;
+        this.numberOfIterations = numberOfIterations;
+        this.literals = literals;
     }
 
     public PageRankHDT(HDT hdt, double dampingFactor, double startValue, int numberOfIterations){
@@ -46,6 +56,7 @@ public class PageRankHDT implements PageRank{
         this.dampingFactor = dampingFactor;
         this.startValue = startValue;
         this.numberOfIterations = numberOfIterations;
+        this.literals = false;
     }
 
     void load(String hdtDump){
@@ -56,10 +67,12 @@ public class PageRankHDT implements PageRank{
         }
     }
 
+
     public void compute() {
         System.out.println("Computing PageRank: " + numberOfIterations +
                 " iterations, damping factor " + dampingFactor +
-                ", start value " + startValue);
+                ", start value " + startValue +
+                ", considering literals " + literals);
 
         long nShared = hdt.getDictionary().getNshared();
         long nSubjects = hdt.getDictionary().getNsubjects();
@@ -79,10 +92,15 @@ public class PageRankHDT implements PageRank{
 //            System.out.println("DICT "+hdt.getDictionary().idToString(i,TripleComponentRole.OBJECT));
 //        }
 
-        start_literals_objects = BinarySearch.first(hdt.getDictionary(), nShared+1, nObjects);
+        start_literals_objects = -1;
+        end_literals_objects = -1;
+        if (literals = true){
+            start_literals_objects = BinarySearch.first(hdt.getDictionary(), nShared+1, nObjects, "\"");
+            end_literals_objects = BinarySearch.last(hdt.getDictionary(), nShared+1, nObjects, nObjects, "\"");
+        }
         System.out.println("start_literals_objects "+start_literals_objects);
-        end_literals_objects = BinarySearch.last(hdt.getDictionary(), nShared+1, nObjects, nObjects);
         System.out.println("end_literals_objects "+end_literals_objects);
+
         numberNonLiterals = nObjects-(end_literals_objects-start_literals_objects);
         System.out.println("numberNonLiterals "+numberNonLiterals);
 

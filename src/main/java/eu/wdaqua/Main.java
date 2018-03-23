@@ -14,6 +14,7 @@ import eu.wdaqua.validation.FileExistValidator;
 import eu.wdaqua.validation.PositiveDouble;
 import eu.wdaqua.validation.ZeroOneDouble;
 
+
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -28,6 +29,8 @@ class Main {
     private Double startValue = 0.1;
     @Parameter(names={"--dumping", "-D"}, validateWith = ZeroOneDouble.class, description = "specifying the dumping factor for the PageRank computation")
     private Double dampingFactor = 0.85;
+    @Parameter(names={"--string"}, description = "option to compute the page rank for strings or not")
+    private Boolean string = false;
     @Parameter(names = "--help", help = true, description = "displays the list of possible parameters")
     private boolean help = false;
     @Parameter(names={"--input", "-in"}, required = true, validateWith = FileExistValidator.class, description = "specify a file in some RDF format or in HDT")
@@ -65,10 +68,10 @@ class Main {
             PageRank pr = null;
             long startTime = System.nanoTime();
             if (input.endsWith(".hdt")){
-                pr = new PageRankHDT(input, dampingFactor, startValue, numberOfIterations);
+                pr = new PageRankHDT(input, dampingFactor, startValue, numberOfIterations, string);
                 pr.compute();
             } else {
-                pr = new PageRankRDF(input, dampingFactor, startValue, numberOfIterations);
+                pr = new PageRankRDF(input, dampingFactor, startValue, numberOfIterations, string);
                 pr.compute();
             }
             PrintWriter writer = new PrintWriter(output, "UTF-8");

@@ -47,6 +47,6 @@ The full list of options is:
         specifying the start value for the PageRank computation
         Default: 0.1
   
- ## Already comnputed datasets
+ ## Already computed datasets
   
  The PageRank scores of some popular RDF datasets can be found [HERE](https://figshare.com/projects/PageRank_scores_of_some_RDF_graphs/28119)

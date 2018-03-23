@@ -94,7 +94,7 @@ public class PageRankHDT implements PageRank{
 
         start_literals_objects = -1;
         end_literals_objects = -1;
-        if (literals = true){
+        if (literals == false){
             start_literals_objects = BinarySearch.first(hdt.getDictionary(), nShared+1, nObjects, "\"");
             end_literals_objects = BinarySearch.last(hdt.getDictionary(), nShared+1, nObjects, nObjects, "\"");
         }

@@ -187,9 +187,9 @@ public class HDTTest implements ProgressListener{
 
     @Test
     public void go7(){
-        System.out.println("Checking example 5 HDT");
+        System.out.println("Checking example 7 HDT");
         ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource("example5.nt").getFile());
+        File file = new File(classLoader.getResource("example7.nt").getFile());
         HDT hdt = null;
         try {
             hdt = HDTManager.generateHDT(file.getAbsolutePath(), "www.wdaqua.eu/qa", RDFNotation.NTRIPLES, new HDTSpecification(), this);
@@ -199,7 +199,7 @@ public class HDTTest implements ProgressListener{
             e.printStackTrace();
         }
 
-        PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.85, 0.15 , 20);
+        PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.85, 0.15 , 20, true);
         pageRankHDT.compute();
 
         List<PageRankScore> scores= pageRankHDT.getPageRankScores();
@@ -214,6 +214,7 @@ public class HDTTest implements ProgressListener{
         result.put("\"literal 1\"", 0.22);
 
         for (PageRankScore score : scores){
+            System.out.println(score.node);
             assertEquals(result.get(score.node), score.pageRank, 0.01);
         }
     }

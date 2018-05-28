@@ -29,7 +29,7 @@ The full list of options is:
     Usage: java -jar pagerank.jar -in file -out pagerank [options]
     Options:
       --damping, -D
-        specifying the dumping factor for the PageRank computation
+        specifying the damping factor for the PageRank computation
         Default: 0.85
       --format, -f
         specify the output format for the PageRank scores, either "tsv" or "nt"

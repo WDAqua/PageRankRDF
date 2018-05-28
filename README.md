@@ -28,7 +28,7 @@ The full list of options is:
 
     Usage: java -jar pagerank.jar -in file -out pagerank [options]
     Options:
-      --dumping, -D
+      --damping, -D
         specifying the dumping factor for the PageRank computation
         Default: 0.85
       --format, -f

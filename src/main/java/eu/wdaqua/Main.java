@@ -27,7 +27,7 @@ class Main {
     private int numberOfIterations = 40;
     @Parameter(names={"--start-value", "-S"}, validateWith = PositiveDouble.class,  description = "specifying the start value for the PageRank computation")
     private Double startValue = 0.1;
-    @Parameter(names={"--dumping", "-D"}, validateWith = ZeroOneDouble.class, description = "specifying the dumping factor for the PageRank computation")
+    @Parameter(names={"--damping", "-D"}, validateWith = ZeroOneDouble.class, description = "specifying the damping factor for the PageRank computation")
     private Double dampingFactor = 0.85;
     @Parameter(names={"--string"}, description = "option to compute the page rank for strings or not")
     private Boolean string = false;

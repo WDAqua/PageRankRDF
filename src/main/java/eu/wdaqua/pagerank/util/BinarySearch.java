@@ -14,12 +14,12 @@ public class BinarySearch {
 //        System.out.println(low+"--"+high);
         if (high >= low) {
             long mid = low + (high - low) / 2;
-//            System.out.println("low "+low);
-//            System.out.println("high "+high);
-//            System.out.println("mid "+mid);
+//            System.out.println("low "+low + " " +  dictionary.idToString(low, TripleComponentRole.OBJECT).toString());
+//            System.out.println("high "+high + " " +  dictionary.idToString(high, TripleComponentRole.OBJECT).toString());
+//            System.out.println("mid "+mid + " " +  dictionary.idToString(mid, TripleComponentRole.OBJECT).toString());
             int c = -1;
             if (mid!=1){
-                //System.out.println(dictionary.idToString(mid - 1, TripleComponentRole.OBJECT).toString());
+//                System.out.println(dictionary.idToString(mid - 1, TripleComponentRole.OBJECT).toString());
                 String s = dictionary.idToString(mid - 1, TripleComponentRole.OBJECT).toString();
                 c = comparator.compare(string, s.substring(0,Math.min(s.length(),string.length())));
             }
@@ -28,7 +28,7 @@ public class BinarySearch {
             int c2 = comparator.compare(string, s.substring(0,Math.min(s.length(),string.length())));
 //            System.out.println("c "+c);
 //            System.out.println("c2 "+c2);
-            if ((mid == 1 || c <= 0) && c2 == 0)
+            if ((mid == 1 || c < 0) && c2 == 0)
                 return mid;
             else if (c > 0)
                 return first(dictionary, (mid + 1), high, string);

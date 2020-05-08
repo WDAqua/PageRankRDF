@@ -39,6 +39,11 @@ class Main {
     private String output;
     @Parameter(names={"--format", "-f"}, validateWith = AllowedFormats.class, description = "specify the output format for the PageRank scores, either \"tsv\" or \"nt\"")
     private String outputFormat = "nt";
+    /** 
+     * Added 7/5/20
+     */
+    @Parameter(names= {"--normalize", "-n"}, description = "option to normalize the values to the number of considered resources (only for HDT)")
+    private Boolean normalize = false; 
 
     public static void main(String ... argv) {
         Main main = new Main();
@@ -68,14 +73,14 @@ class Main {
             PageRank pr = null;
             long startTime = System.nanoTime();
             if (input.endsWith(".hdt")){
-                pr = new PageRankHDT(input, dampingFactor, startValue, numberOfIterations, string);
+                pr = new PageRankHDT(input, dampingFactor, startValue, numberOfIterations, string, normalize);
                 pr.compute();
             } else {
                 pr = new PageRankRDF(input, dampingFactor, startValue, numberOfIterations, string);
                 pr.compute();
             }
             PrintWriter writer = new PrintWriter(output, "UTF-8");
-            if (outputFormat=="nt"){
+            if (outputFormat.equalsIgnoreCase("nt")){
                 pr.printPageRankScoresRDF(writer);
             } else {
                 pr.printPageRankScoresTSV(writer);

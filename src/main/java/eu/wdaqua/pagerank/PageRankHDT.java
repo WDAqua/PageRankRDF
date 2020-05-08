@@ -24,31 +24,37 @@ public class PageRankHDT implements PageRank{
     private static int numberOfIterations = 40;
     private HDT hdt;
     private BigIntArray numberOutgoing;
+    // we use this one to store the reference and do the swap
     private BigDoubleArray pageRankScoresShared;
+    private BigDoubleArray pageRankScoresSharedPrev; 
+    private BigDoubleArray pageRankScoresSharedNext; 
     private BigDoubleArray pageRankScoresObjects;
     //used to identify all literals, since the entries in the dictionary are ordered, an interval suffices
     private long start_literals_objects = -1;
     private long end_literals_objects = -1;
     private boolean literals;
+    private boolean normalize; 
 
     public PageRankHDT(String hdtDump){
         this.load(hdtDump);
     }
 
-    public PageRankHDT(String hdtDump, double dampingFactor, double startValue,  int numberOfIterations, boolean literals){
+    public PageRankHDT(String hdtDump, double dampingFactor, double startValue,  int numberOfIterations, boolean literals, boolean normalize){
         this.load(hdtDump);
         this.dampingFactor = dampingFactor;
         this.startValue = startValue;
         this.numberOfIterations = numberOfIterations;
         this.literals = literals;
+        this.normalize = normalize; 
     }
 
-    public PageRankHDT(HDT hdt, double dampingFactor, double startValue, int numberOfIterations, boolean literals){
+    public PageRankHDT(HDT hdt, double dampingFactor, double startValue, int numberOfIterations, boolean literals, boolean normalize){
         this.hdt = hdt;
         this.dampingFactor = dampingFactor;
         this.startValue = startValue;
         this.numberOfIterations = numberOfIterations;
         this.literals = literals;
+        this.normalize = normalize; 
     }
 
     public PageRankHDT(HDT hdt, double dampingFactor, double startValue, int numberOfIterations){
@@ -57,6 +63,7 @@ public class PageRankHDT implements PageRank{
         this.startValue = startValue;
         this.numberOfIterations = numberOfIterations;
         this.literals = false;
+        this.normalize = false; 
     }
 
     void load(String hdtDump){
@@ -72,7 +79,8 @@ public class PageRankHDT implements PageRank{
         System.out.println("Computing PageRank: " + numberOfIterations +
                 " iterations, damping factor " + dampingFactor +
                 ", start value " + startValue +
-                ", considering literals " + literals);
+                ", considering literals " + literals + 
+                ", normalizing "+ normalize);
 
         long nShared = hdt.getDictionary().getNshared();
         long nSubjects = hdt.getDictionary().getNsubjects();
@@ -104,17 +112,20 @@ public class PageRankHDT implements PageRank{
         numberNonLiterals = nObjects-(end_literals_objects-start_literals_objects);
         System.out.println("numberNonLiterals "+numberNonLiterals);
 
-        pageRankScoresShared = new BigDoubleArray((int)hdt.getDictionary().getNshared()+1);
+        // we only have to store the prev and next values of the shared elements
+        // the rest of elemnts are just sinks 
+        pageRankScoresSharedPrev = new BigDoubleArray((int)hdt.getDictionary().getNshared()+1);
+        pageRankScoresSharedNext = new BigDoubleArray((int)hdt.getDictionary().getNshared()+1); 
         pageRankScoresObjects = new BigDoubleArray(numberNonLiterals+1);
+        
 
-        //Initialize the start page rank scores
+        //Initialize the start page rank scores (only the prev set) 
         for (int id=1; id<=nShared; id++){
-            pageRankScoresShared.set(id,startValue);
+            pageRankScoresSharedPrev.set(id,startValue);
         }
         for (int k=0; k<numberNonLiterals; k++){
             pageRankScoresObjects.set(k,startValue);
         }
-
 
         //Compute the number of outgoing links
         System.out.println("Compute number of outgoing edges");
@@ -135,26 +146,39 @@ public class PageRankHDT implements PageRank{
         //Compute the page rank
         System.out.println("Compute the page rank");
         System.err.println("Iteration...");
+        
+        // to get the actual number of elements we need 
+        // to take into account the "only-subj" elements 
+        // numberNonLiterals == (nObjects - literal ones)
+        double numberAffectedElements = numberNonLiterals + (hdt.getDictionary().getNsubjects()-hdt.getDictionary().getNshared()); 
+        								
         for (int j = 0; j < numberOfIterations; j++) {
             System.err.print(j +" ");
             for (int id=1; id<=nObjects; id++){
                 if (!(id>=start_literals_objects && id<=end_literals_objects)) {
                     TripleID root = new TripleID(0, 0, id);
                     IteratorTripleID incomingLinks = hdt.getTriples().search(root);
-                    double pageRank = 1.0D - dampingFactor;
+                    double pageRank = 0.0D; 
+                    if (normalize) {
+                    	pageRank = (1.0D - dampingFactor) / numberAffectedElements; 
+                    }
+                    else {
+                    	pageRank = (1.0D - dampingFactor); 
+                    }
                     while (incomingLinks.hasNext()) {
                         TripleID inLink = incomingLinks.next();
                         Double pageRankIn = 0.0;
                         if (inLink.getSubject() <= nShared) {
-                            pageRankIn = pageRankScoresShared.get(inLink.getSubject());
+                            pageRankIn = pageRankScoresSharedPrev.get(inLink.getSubject());
                         } else {
+                        	// the subject is just contributing (not having any incoming contribution) 
                             pageRankIn = startValue;
                         }
                         int numberOut = numberOutgoing.get(inLink.getSubject());
                         pageRank += dampingFactor * (pageRankIn / numberOut);
                     }
                     if (id <= nShared) {
-                        pageRankScoresShared.set(id,pageRank);
+                        pageRankScoresSharedNext.set(id,pageRank);
                     } else {
                         if (id < start_literals_objects){
                             pageRankScoresObjects.set(id,pageRank);
@@ -164,7 +188,19 @@ public class PageRankHDT implements PageRank{
                     }
                 }
             }
+            
+            
+            // we swap Prev and Next shared storages
+            // CBL: I take advantage of the already existing variable to 
+            // make the reference swap and reuse the memory
+            
+            pageRankScoresShared = pageRankScoresSharedNext; 
+            pageRankScoresSharedNext = pageRankScoresSharedPrev; 
+            pageRankScoresSharedPrev = pageRankScoresShared; 
+            
         }
+        // in the last iteration pageRankScoresShared == pageRankScoresSharedNext
+        // and pageRankScoresObjects are just receiving the influence (so they don't need to have an aux storage). 
         System.out.println("\n");
     }
 

@@ -15,7 +15,10 @@ public class PageRankRDF implements PageRank{
     private static double startValue = 0.1D;
     private static int numberOfIterations = 40;
     private String dump;
-    private HashMap<String, Double> pageRankScores = new HashMap();
+    // same strategy as for PageRankHDT
+    private HashMap<String, Double> pageRankScores; 
+    private HashMap<String, Double> pageRankScoresPrev = new HashMap();
+    private HashMap<String, Double> pageRankScoresNext = new HashMap(); 
     private boolean literals;
 
     public PageRankRDF(String dump){
@@ -35,7 +38,7 @@ public class PageRankRDF implements PageRank{
         this.dampingFactor = dampingFactor;
         this.startValue = startValue;
         this.numberOfIterations = numberOfIterations;
-        this.literals = false;
+        this.literals = false; 
     }
 
     public void compute() {
@@ -77,29 +80,33 @@ public class PageRankRDF implements PageRank{
                 " iterations, damping factor " + dampingFactor +
                 ", start value " + startValue +
                 ", considering literals " + literals);
-
+        
         Set<String> keyset = incomingPerPage.keySet();
         System.err.println("Iteration ...");
         for (int j = 1; j <= numberOfIterations; j++) {
             System.err.print(j +" ");
             for (String string : keyset) {
                 ArrayList<String> incomingLinks = (ArrayList)incomingPerPage.get(string);
-
+                // I stop here for now 
                 double pageRank = 1.0D - dampingFactor;
+                
                 for (String inLink : incomingLinks) {
-                    Double pageRankIn = (Double)pageRankScores.get(inLink);
+                    Double pageRankIn = (Double)pageRankScoresPrev.get(inLink);
                     if (pageRankIn == null) {
                         pageRankIn = Double.valueOf(startValue);
                     }
                     int numberOut = ((Integer)numberOutgoing.get(inLink)).intValue();
                     pageRank += dampingFactor * (pageRankIn.doubleValue() / numberOut);
                 }
-                pageRankScores.put(string, Double.valueOf(pageRank));
+                pageRankScoresNext.put(string, Double.valueOf(pageRank));
             }
+            
+            pageRankScores = pageRankScoresNext; 
+            pageRankScoresNext = pageRankScoresPrev; 
+            pageRankScoresPrev = pageRankScores; 
         }
+        // in the last iteration pageRankScores == pageRankScoresNext
         System.err.println();
-
-
 
         time = System.currentTimeMillis() - time;
         System.err.println("Computing PageRank took " + time / 1000L + "s");

@@ -154,7 +154,7 @@ public class PageRankHDT implements PageRank{
         								
         for (int j = 0; j < numberOfIterations; j++) {
             System.err.print(j +" ");
-            // Having separated the read and write access assures us that pageRankScoresSharedPrev is 
+            // CBL: Having separated the read and write access assures us that pageRankScoresSharedPrev is 
             // accessed only in readOnly mode, and in fact, the set position always affects different 
             // elements. The only "problematic" call could be HDT binary search, but I assume that it's a read
             // only operation, with no side effect at all
@@ -195,8 +195,8 @@ public class PageRankHDT implements PageRank{
                 }                
             });            
             
-            // we swap Prev and Next shared storages
-            // CBL: I take advantage of the already existing variable to 
+            // CBL: we swap Prev and Next shared storages
+            // I take advantage of the already existing variable to 
             // make the reference swap and reuse the memory
             
             pageRankScoresShared = pageRankScoresSharedNext; 
@@ -204,7 +204,7 @@ public class PageRankHDT implements PageRank{
             pageRankScoresSharedPrev = pageRankScoresShared; 
             
         }
-        // in the last iteration pageRankScoresShared == pageRankScoresSharedNext
+        //  CBL: in the last iteration pageRankScoresShared == pageRankScoresSharedNext
         // and pageRankScoresObjects are just receiving the influence (so they don't need to have an aux storage). 
         System.out.println("\n");
     }

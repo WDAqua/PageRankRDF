@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.LongStream;
 
 public class PageRankHDT implements PageRank{
 
@@ -33,28 +34,28 @@ public class PageRankHDT implements PageRank{
     private long start_literals_objects = -1;
     private long end_literals_objects = -1;
     private boolean literals;
-    private boolean normalize; 
+    private boolean parallelize; 
 
     public PageRankHDT(String hdtDump){
         this.load(hdtDump);
     }
 
-    public PageRankHDT(String hdtDump, double dampingFactor, double startValue,  int numberOfIterations, boolean literals, boolean normalize){
+    public PageRankHDT(String hdtDump, double dampingFactor, double startValue,  int numberOfIterations, boolean literals, boolean parallelize){
         this.load(hdtDump);
         this.dampingFactor = dampingFactor;
         this.startValue = startValue;
         this.numberOfIterations = numberOfIterations;
         this.literals = literals;
-        this.normalize = normalize; 
+        this.parallelize = parallelize; 
     }
 
-    public PageRankHDT(HDT hdt, double dampingFactor, double startValue, int numberOfIterations, boolean literals, boolean normalize){
+    public PageRankHDT(HDT hdt, double dampingFactor, double startValue, int numberOfIterations, boolean literals, boolean parallelize){
         this.hdt = hdt;
         this.dampingFactor = dampingFactor;
         this.startValue = startValue;
         this.numberOfIterations = numberOfIterations;
         this.literals = literals;
-        this.normalize = normalize; 
+        this.parallelize = parallelize; 
     }
 
     public PageRankHDT(HDT hdt, double dampingFactor, double startValue, int numberOfIterations){
@@ -63,7 +64,7 @@ public class PageRankHDT implements PageRank{
         this.startValue = startValue;
         this.numberOfIterations = numberOfIterations;
         this.literals = false;
-        this.normalize = false; 
+        this.parallelize = false; 
     }
 
     void load(String hdtDump){
@@ -79,8 +80,7 @@ public class PageRankHDT implements PageRank{
         System.out.println("Computing PageRank: " + numberOfIterations +
                 " iterations, damping factor " + dampingFactor +
                 ", start value " + startValue +
-                ", considering literals " + literals + 
-                ", normalizing "+ normalize);
+                ", considering literals " + literals );
 
         long nShared = hdt.getDictionary().getNshared();
         long nSubjects = hdt.getDictionary().getNsubjects();
@@ -154,17 +154,23 @@ public class PageRankHDT implements PageRank{
         								
         for (int j = 0; j < numberOfIterations; j++) {
             System.err.print(j +" ");
-            for (int id=1; id<=nObjects; id++){
+            // Having separated the read and write access assures us that pageRankScoresSharedPrev is 
+            // accessed only in readOnly mode, and in fact, the set position always affects different 
+            // elements. The only "problematic" call could be HDT binary search, but I assume that it's a read
+            // only operation, with no side effect at all
+            LongStream stream = null; 
+            
+            if (parallelize) {
+            	stream = LongStream.range(1, nObjects+1).parallel(); 
+            }
+            else {
+            	stream = LongStream.range(1, nObjects+1); 
+            }
+            stream.forEach( id -> {
                 if (!(id>=start_literals_objects && id<=end_literals_objects)) {
                     TripleID root = new TripleID(0, 0, id);
                     IteratorTripleID incomingLinks = hdt.getTriples().search(root);
-                    double pageRank = 0.0D; 
-                    if (normalize) {
-                    	pageRank = (1.0D - dampingFactor) / numberAffectedElements; 
-                    }
-                    else {
-                    	pageRank = (1.0D - dampingFactor); 
-                    }
+                    double pageRank = (1.0D - dampingFactor); 
                     while (incomingLinks.hasNext()) {
                         TripleID inLink = incomingLinks.next();
                         Double pageRankIn = 0.0;
@@ -186,9 +192,8 @@ public class PageRankHDT implements PageRank{
                             pageRankScoresObjects.set(id-(end_literals_objects-start_literals_objects), pageRank);
                         }
                     }
-                }
-            }
-            
+                }                
+            });            
             
             // we swap Prev and Next shared storages
             // CBL: I take advantage of the already existing variable to 

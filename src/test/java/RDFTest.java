@@ -16,7 +16,7 @@ public class RDFTest {
         ClassLoader classLoader = getClass().getClassLoader();
         String dump = classLoader.getResource("example1.nt").getFile().toString();
         System.out.println(dump);
-        PageRankRDF pageRankRDF = new PageRankRDF(dump, 0.50, 1.0 , 20);
+        PageRankRDF pageRankRDF = new PageRankRDF(dump, 0.50, 1.0 , 40);
         pageRankRDF.compute();
 
         List<PageRankScore> scores= pageRankRDF.getPageRankScores();
@@ -34,7 +34,7 @@ public class RDFTest {
         System.out.println("Checking example 2 RDF");
         ClassLoader classLoader = getClass().getClassLoader();
         String dump = classLoader.getResource("example2.nt").getFile().toString();
-        PageRankRDF pageRankRDF = new PageRankRDF(dump, 0.85, 0.15 , 20);
+        PageRankRDF pageRankRDF = new PageRankRDF(dump, 0.85, 0.15 , 40);
         pageRankRDF.compute();
 
         List<PageRankScore> scores= pageRankRDF.getPageRankScores();
@@ -54,7 +54,7 @@ public class RDFTest {
         System.out.println("Checking example 3 RDF");
         ClassLoader classLoader = getClass().getClassLoader();
         String dump = classLoader.getResource("example3.nt").getFile().toString();
-        PageRankRDF pageRankRDF = new PageRankRDF(dump, 0.85, 0.15 , 20);
+        PageRankRDF pageRankRDF = new PageRankRDF(dump, 0.85, 0.15 , 40);
         pageRankRDF.compute();
 
         List<PageRankScore> scores= pageRankRDF.getPageRankScores();
@@ -73,7 +73,7 @@ public class RDFTest {
         System.out.println("Checking example 4 RDF");
         ClassLoader classLoader = getClass().getClassLoader();
         String dump = classLoader.getResource("example4.nt").getFile().toString();
-        PageRankRDF pageRankRDF = new PageRankRDF(dump, 0.85, 0.15 , 20);
+        PageRankRDF pageRankRDF = new PageRankRDF(dump, 0.85, 0.15 , 40);
         pageRankRDF.compute();
 
         List<PageRankScore> scores= pageRankRDF.getPageRankScores();
@@ -96,7 +96,7 @@ public class RDFTest {
         System.out.println("Checking example 5 RDF");
         ClassLoader classLoader = getClass().getClassLoader();
         String dump = classLoader.getResource("example5.nt").getFile().toString();
-        PageRankRDF pageRankRDF = new PageRankRDF(dump, 0.85, 0.15 , 20);
+        PageRankRDF pageRankRDF = new PageRankRDF(dump, 0.85, 0.15 , 40);
         pageRankRDF.compute();
 
         List<PageRankScore> scores= pageRankRDF.getPageRankScores();
@@ -119,7 +119,7 @@ public class RDFTest {
         System.out.println("Checking example 7 RDF");
         ClassLoader classLoader = getClass().getClassLoader();
         String dump = classLoader.getResource("example7.nt").getFile().toString();
-        PageRankRDF pageRankRDF = new PageRankRDF(dump, 0.85, 0.15 , 20,true);
+        PageRankRDF pageRankRDF = new PageRankRDF(dump, 0.85, 0.15 , 40,true, false);
         pageRankRDF.compute();
 
         List<PageRankScore> scores= pageRankRDF.getPageRankScores();

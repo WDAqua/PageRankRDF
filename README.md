@@ -1,7 +1,5 @@
 # PageRankRDF
 
-## Note: This repository is now mantained by QAnswer, it can be found [here](https://github.com/QAnswer/PageRankRDF).
-
 This repository contains a command line tool to compute PageRank scores over RDF graphs. Applying the PageRank algorithm to RDF graphs is not difficult, but doing it in a memory efficient and scalable way is not easy.
 
 ## Usage
@@ -51,6 +49,4 @@ The full list of options is:
   
  ## Already computed datasets
  
- ## Note: This repository is now mantained by QAnswer, it can be found [here](https://github.com/QAnswer/PageRankRDF).
-  
  The PageRank scores of some popular RDF datasets can be found [HERE](https://figshare.com/projects/PageRank_scores_of_some_RDF_graphs/28119)

@@ -11,6 +11,7 @@ import org.rdfhdt.hdt.options.HDTSpecification;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -32,16 +33,18 @@ public class HDTTest implements ProgressListener{
             e.printStackTrace();
         }
 
-        PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.50, 1.0 , 40);
-        pageRankHDT.compute();
+        for (boolean b : Arrays.asList(true,false)) {
+            PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.50, 1.0, 40,false,b);
+            pageRankHDT.compute();
 
-        List<PageRankScore> scores= pageRankHDT.getPageRankScores();
-        HashMap<String,Double> result = new HashMap<String, Double>();
-        result.put("PageA", 1.07692308);
-        result.put("PageB", 0.76923077);
-        result.put("PageC", 1.15384615);
-        for (PageRankScore score : scores){
-            assertEquals(result.get(score.node), score.pageRank, 0.001);
+            List<PageRankScore> scores = pageRankHDT.getPageRankScores();
+            HashMap<String, Double> result = new HashMap<String, Double>();
+            result.put("PageA", 1.07692308);
+            result.put("PageB", 0.76923077);
+            result.put("PageC", 1.15384615);
+            for (PageRankScore score : scores) {
+                assertEquals(result.get(score.node), score.pageRank, 0.001);
+            }
         }
     }
 
@@ -59,17 +62,19 @@ public class HDTTest implements ProgressListener{
             e.printStackTrace();
         }
 
-        PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.85, 0.15 , 40);
-        pageRankHDT.compute();
+        for (boolean b : Arrays.asList(true,false)) {
+            PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.85, 0.15, 40,false,b);
+            pageRankHDT.compute();
 
-        List<PageRankScore> scores= pageRankHDT.getPageRankScores();
-        HashMap<String,Double> result = new HashMap<String, Double>();
-        result.put("PageA", 1.49);
-        result.put("PageB", 0.78);
-        result.put("PageC", 1.58);
-        result.put("PageD", 0.15);
-        for (PageRankScore score : scores){
-            assertEquals(result.get(score.node), score.pageRank, 0.01);
+            List<PageRankScore> scores = pageRankHDT.getPageRankScores();
+            HashMap<String, Double> result = new HashMap<String, Double>();
+            result.put("PageA", 1.49);
+            result.put("PageB", 0.78);
+            result.put("PageC", 1.58);
+            result.put("PageD", 0.15);
+            for (PageRankScore score : scores) {
+                assertEquals(result.get(score.node), score.pageRank, 0.01);
+            }
         }
     }
 
@@ -87,17 +92,19 @@ public class HDTTest implements ProgressListener{
             e.printStackTrace();
         }
 
-        PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.85, 0.15 , 40);
-        pageRankHDT.compute();
+        for (boolean b : Arrays.asList(true,false)) {
+            PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.85, 0.15, 40,false,b);
+            pageRankHDT.compute();
 
-        List<PageRankScore> scores= pageRankHDT.getPageRankScores();
-        HashMap<String,Double> result = new HashMap<String, Double>();
-        result.put("PageA", 1.49);
-        result.put("PageB", 0.78);
-        result.put("PageC", 1.58);
-        result.put("PageD", 0.15);
-        for (PageRankScore score : scores){
-            assertEquals(result.get(score.node), score.pageRank, 0.01);
+            List<PageRankScore> scores = pageRankHDT.getPageRankScores();
+            HashMap<String, Double> result = new HashMap<String, Double>();
+            result.put("PageA", 1.49);
+            result.put("PageB", 0.78);
+            result.put("PageC", 1.58);
+            result.put("PageD", 0.15);
+            for (PageRankScore score : scores) {
+                assertEquals(result.get(score.node), score.pageRank, 0.01);
+            }
         }
     }
 
@@ -115,22 +122,24 @@ public class HDTTest implements ProgressListener{
             e.printStackTrace();
         }
 
-        PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.85, 0.15 , 40);
-        pageRankHDT.compute();
+        for (boolean b : Arrays.asList(true,false)) {
+            PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.85, 0.15, 40,false,b);
+            pageRankHDT.compute();
 
-        List<PageRankScore> scores= pageRankHDT.getPageRankScores();
-        HashMap<String,Double> result = new HashMap<String, Double>();
-        result.put("PageA", 0.92);
-        result.put("PageB", 0.41);
-        result.put("PageC", 0.41);
-        result.put("PageD", 0.41);
-        result.put("PageE", 0.22);
-        result.put("PageF", 0.22);
-        result.put("PageG", 0.22);
-        result.put("PageH", 0.22);
+            List<PageRankScore> scores = pageRankHDT.getPageRankScores();
+            HashMap<String, Double> result = new HashMap<String, Double>();
+            result.put("PageA", 0.92);
+            result.put("PageB", 0.41);
+            result.put("PageC", 0.41);
+            result.put("PageD", 0.41);
+            result.put("PageE", 0.22);
+            result.put("PageF", 0.22);
+            result.put("PageG", 0.22);
+            result.put("PageH", 0.22);
 
-        for (PageRankScore score : scores){
-            assertEquals(result.get(score.node), score.pageRank, 0.01);
+            for (PageRankScore score : scores) {
+                assertEquals(result.get(score.node), score.pageRank, 0.01);
+            }
         }
     }
 
@@ -148,41 +157,25 @@ public class HDTTest implements ProgressListener{
             e.printStackTrace();
         }
 
-        PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.85, 0.15 , 40);
-        pageRankHDT.compute();
+        for (boolean b : Arrays.asList(true,false)) {
+            PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.85, 0.15, 40, false, b);
+            pageRankHDT.compute();
 
-        List<PageRankScore> scores= pageRankHDT.getPageRankScores();
-        HashMap<String,Double> result = new HashMap<String, Double>();
-        result.put("PageA", 0.92);
-        result.put("PageB", 0.41);
-        result.put("PageC", 0.41);
-        result.put("PageD", 0.41);
-        result.put("PageE", 0.22);
-        result.put("PageF", 0.22);
-        result.put("PageG", 0.22);
-        result.put("PageH", 0.22);
+            List<PageRankScore> scores = pageRankHDT.getPageRankScores();
+            HashMap<String, Double> result = new HashMap<String, Double>();
+            result.put("PageA", 0.92);
+            result.put("PageB", 0.41);
+            result.put("PageC", 0.41);
+            result.put("PageD", 0.41);
+            result.put("PageE", 0.22);
+            result.put("PageF", 0.22);
+            result.put("PageG", 0.22);
+            result.put("PageH", 0.22);
 
-        for (PageRankScore score : scores){
-            assertEquals(result.get(score.node), score.pageRank, 0.01);
+            for (PageRankScore score : scores) {
+                assertEquals(result.get(score.node), score.pageRank, 0.01);
+            }
         }
-    }
-
-    @Test
-    public void go6(){
-        System.out.println("Checking example 6 HDT");
-        ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource("example6.nt").getFile());
-        HDT hdt = null;
-        try {
-            hdt = HDTManager.generateHDT(file.getAbsolutePath(), "www.wdaqua.eu/qa", RDFNotation.NTRIPLES, new HDTSpecification(), this);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ParserException e) {
-            e.printStackTrace();
-        }
-
-        PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.85, 0.15 , 40);
-        pageRankHDT.compute();
     }
 
     @Test
@@ -199,23 +192,25 @@ public class HDTTest implements ProgressListener{
             e.printStackTrace();
         }
 
-        PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.85, 0.15 , 40, true, false);
-        pageRankHDT.compute();
+        for (boolean b : Arrays.asList(true,false)) {
+            PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.85, 0.15, 40, true, b);
+            pageRankHDT.compute();
 
-        List<PageRankScore> scores= pageRankHDT.getPageRankScores();
-        HashMap<String,Double> result = new HashMap<String, Double>();
-        result.put("PageA", 0.92);
-        result.put("PageB", 0.41);
-        result.put("PageC", 0.41);
-        result.put("PageD", 0.41);
-        result.put("PageE", 0.22);
-        result.put("PageF", 0.22);
-        result.put("PageG", 0.22);
-        result.put("\"literal 1\"", 0.22);
+            List<PageRankScore> scores = pageRankHDT.getPageRankScores();
+            HashMap<String, Double> result = new HashMap<String, Double>();
+            result.put("PageA", 0.92);
+            result.put("PageB", 0.41);
+            result.put("PageC", 0.41);
+            result.put("PageD", 0.41);
+            result.put("PageE", 0.22);
+            result.put("PageF", 0.22);
+            result.put("PageG", 0.22);
+            result.put("\"literal 1\"", 0.22);
 
-        for (PageRankScore score : scores){
-            System.out.println(score.node);
-            assertEquals(result.get(score.node), score.pageRank, 0.01);
+            for (PageRankScore score : scores) {
+                System.out.println(score.node);
+                assertEquals(result.get(score.node), score.pageRank, 0.01);
+            }
         }
     }
 

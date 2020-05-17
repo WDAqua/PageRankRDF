@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
 public class PageRankRDF implements PageRank{
 
@@ -15,19 +17,25 @@ public class PageRankRDF implements PageRank{
     private static double startValue = 0.1D;
     private static int numberOfIterations = 40;
     private String dump;
-    private HashMap<String, Double> pageRankScores = new HashMap();
+    // same strategy as for PageRankHDT
+    private ConcurrentHashMap<String, Double> pageRankScores; 
+    private ConcurrentHashMap<String, Double> pageRankScoresPrev = new ConcurrentHashMap();
+    private ConcurrentHashMap<String, Double> pageRankScoresNext = new ConcurrentHashMap(); 
     private boolean literals;
+    
+    private boolean parallelize; 
 
     public PageRankRDF(String dump){
         this.dump = dump;
     }
 
-    public PageRankRDF(String dump, double dampingFactor, double startValue, int numberOfIterations, boolean literals){
+    public PageRankRDF(String dump, double dampingFactor, double startValue, int numberOfIterations, boolean literals, boolean parallelize){
         this.dump = dump;
         this.dampingFactor = dampingFactor;
         this.startValue = startValue;
         this.numberOfIterations = numberOfIterations;
         this.literals = literals;
+        this.parallelize = parallelize; 
     }
 
     public PageRankRDF(String dump, double dampingFactor, double startValue, int numberOfIterations){
@@ -35,7 +43,8 @@ public class PageRankRDF implements PageRank{
         this.dampingFactor = dampingFactor;
         this.startValue = startValue;
         this.numberOfIterations = numberOfIterations;
-        this.literals = false;
+        this.literals = false; 
+        this.parallelize = false; 
     }
 
     public void compute() {
@@ -77,29 +86,40 @@ public class PageRankRDF implements PageRank{
                 " iterations, damping factor " + dampingFactor +
                 ", start value " + startValue +
                 ", considering literals " + literals);
-
+        
         Set<String> keyset = incomingPerPage.keySet();
         System.err.println("Iteration ...");
         for (int j = 1; j <= numberOfIterations; j++) {
             System.err.print(j +" ");
-            for (String string : keyset) {
-                ArrayList<String> incomingLinks = (ArrayList)incomingPerPage.get(string);
-
-                double pageRank = 1.0D - dampingFactor;
-                for (String inLink : incomingLinks) {
-                    Double pageRankIn = (Double)pageRankScores.get(inLink);
-                    if (pageRankIn == null) {
-                        pageRankIn = Double.valueOf(startValue);
-                    }
-                    int numberOut = ((Integer)numberOutgoing.get(inLink)).intValue();
-                    pageRank += dampingFactor * (pageRankIn.doubleValue() / numberOut);
-                }
-                pageRankScores.put(string, Double.valueOf(pageRank));
+            Stream<String> keys = null; 
+            if (parallelize) {
+            	keys = keyset.parallelStream(); 
             }
+            else {
+            	keys = keyset.stream(); 
+            }
+            keys.forEach( string -> {
+            	ArrayList<String> incomingLinks = (ArrayList)incomingPerPage.get(string);
+              // I stop here for now 
+              double pageRank = 1.0D - dampingFactor;
+              
+              for (String inLink : incomingLinks) {
+                  Double pageRankIn = (Double)pageRankScoresPrev.get(inLink);
+                  if (pageRankIn == null) {
+                      pageRankIn = Double.valueOf(startValue);
+                  }
+                  int numberOut = ((Integer)numberOutgoing.get(inLink)).intValue();
+                  pageRank += dampingFactor * (pageRankIn.doubleValue() / numberOut);
+              }
+              pageRankScoresNext.put(string, Double.valueOf(pageRank));
+            });
+            
+            pageRankScores = pageRankScoresNext; 
+            pageRankScoresNext = pageRankScoresPrev; 
+            pageRankScoresPrev = pageRankScores; 
         }
+        // in the last iteration pageRankScores == pageRankScoresNext
         System.err.println();
-
-
 
         time = System.currentTimeMillis() - time;
         System.err.println("Computing PageRank took " + time / 1000L + "s");

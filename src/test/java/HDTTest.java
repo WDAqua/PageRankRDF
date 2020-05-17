@@ -32,7 +32,7 @@ public class HDTTest implements ProgressListener{
             e.printStackTrace();
         }
 
-        PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.50, 1.0 , 20);
+        PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.50, 1.0 , 40);
         pageRankHDT.compute();
 
         List<PageRankScore> scores= pageRankHDT.getPageRankScores();
@@ -59,7 +59,7 @@ public class HDTTest implements ProgressListener{
             e.printStackTrace();
         }
 
-        PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.85, 0.15 , 20);
+        PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.85, 0.15 , 40);
         pageRankHDT.compute();
 
         List<PageRankScore> scores= pageRankHDT.getPageRankScores();
@@ -87,7 +87,7 @@ public class HDTTest implements ProgressListener{
             e.printStackTrace();
         }
 
-        PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.85, 0.15 , 20);
+        PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.85, 0.15 , 40);
         pageRankHDT.compute();
 
         List<PageRankScore> scores= pageRankHDT.getPageRankScores();
@@ -115,7 +115,7 @@ public class HDTTest implements ProgressListener{
             e.printStackTrace();
         }
 
-        PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.85, 0.15 , 20);
+        PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.85, 0.15 , 40);
         pageRankHDT.compute();
 
         List<PageRankScore> scores= pageRankHDT.getPageRankScores();
@@ -148,7 +148,7 @@ public class HDTTest implements ProgressListener{
             e.printStackTrace();
         }
 
-        PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.85, 0.15 , 20);
+        PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.85, 0.15 , 40);
         pageRankHDT.compute();
 
         List<PageRankScore> scores= pageRankHDT.getPageRankScores();
@@ -181,7 +181,7 @@ public class HDTTest implements ProgressListener{
             e.printStackTrace();
         }
 
-        PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.85, 0.15 , 20);
+        PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.85, 0.15 , 40);
         pageRankHDT.compute();
     }
 
@@ -199,7 +199,7 @@ public class HDTTest implements ProgressListener{
             e.printStackTrace();
         }
 
-        PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.85, 0.15 , 20, true);
+        PageRankHDT pageRankHDT = new PageRankHDT(hdt, 0.85, 0.15 , 40, true, false);
         pageRankHDT.compute();
 
         List<PageRankScore> scores= pageRankHDT.getPageRankScores();
